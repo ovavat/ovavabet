@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Bolão da Copa 2026 • Ovavat</title>
+    
+    <!-- Metadados para transformar em App (PWA) e adicionar à Tela Inicial -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ovavat">
+    <link rel="icon" href="https://kappa.lol/QKdKIp" type="image/png">
+    <link rel="apple-touch-icon" href="https://kappa.lol/QKdKIp">
+    <link rel="shortcut icon" href="https://kappa.lol/QKdKIp" type="image/png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+        .card-animado { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-animado:active { transform: scale(0.98); }
+        .sombra-suave { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05); }
+        .sombra-suave-dark { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 antialiased min-h-screen pb-12 bg-slate-50/50 dark:bg-slate-950">
+
+    <nav class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-center relative">
+            <span class="font-extrabold text-2xl tracking-tight" style="color: #a041c6;">
+                Ovavat
+            </span>
+            <button id="dark-mode-toggle" onclick="alternarModoEscuro()" class="absolute right-4 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300">
+                <i class="fa-solid fa-moon text-lg" id="dark-mode-icon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-lg mx-auto pt-6 px-4">
+        
+        <div class="mb-6 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between transition-colors duration-300">
+            <div class="flex items-center gap-3">
+                <div class="relative flex h-3 w-3">
+                    <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span id="status-ponto" class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Fonte de Resultados</p>
+                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-300" id="status-texto">Buscando dados...</p>
+                </div>
+            </div>
+            <button onclick="forcarSincronizacao()" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-sync" id="icone-atualizar"></i> Atualizar
+            </button>
+        </div>
+
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-6 transition-colors duration-300 overflow-x-auto hide-scroll">
+            <button id="tab-ranking-btn" onclick="mudarAba('ranking')" class="flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 whitespace-nowrap">
+                🏅 Ranking
+            </button>
+            <button id="tab-jogos-btn" onclick="mudarAba('jogos')" class="flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1 whitespace-nowrap">
+                ⚽ Tabela
+            </button>
+            <button id="tab-matamata-btn" onclick="mudarAba('matamata')" class="flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1 whitespace-nowrap">
+                ⚡ Mata-Mata
+            </button>
+        </div>
+
+        <div id="aba-ranking" class="space-y-4">
+            <ul id="ranking-list" class="flex flex-col gap-3">
+                <li class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 text-center text-sm text-slate-400 dark:text-slate-500 transition-colors duration-300">
+                    <i class="fa-solid fa-spinner fa-spin mr-2 text-emerald-600 dark:text-emerald-400"></i> Buscando palpites e resultados...
+                </li>
+            </ul>
+        </div>
+
+        <div id="aba-jogos" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm transition-colors duration-300">
+                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-emerald-600 dark:text-emerald-400"></i> Classificação Oficial
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Estatísticas oficiais sincronizadas com a Wikipédia em tempo real.
+                </p>
+            </div>
+            <div id="lista-jogos" class="space-y-4"></div>
+        </div>
+
+        <div id="aba-matamata" class="hidden space-y-4">
+            <!-- Header Clickável para o Raio-X -->
+            <div onclick="abrirModalPalpitesMataMata()" class="cursor-pointer bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700/60 group relative overflow-hidden">
+                <div class="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors border-l border-slate-100 dark:border-slate-800">
+                    <i class="fa-solid fa-expand text-slate-400 group-hover:text-emerald-500 transition-colors"></i>
+                </div>
+                <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-sitemap text-emerald-600 dark:text-emerald-400"></i> Chaveamento Mata-Mata
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pr-10">
+                    Acompanhe a fase eliminatória. Os palpites de cada participante são cruzados dinamicamente. <span class="text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">Clique para abrir o Raio-X de Palpites.</span>
+                </p>
+            </div>
+
+            <div class="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto hide-scroll transition-colors duration-300">
+                <button onclick="mudarFaseEliminatoria('r32')" id="fase-r32-btn" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-400 shadow-sm transition-all duration-200 whitespace-nowrap">
+                    2ª Fase
+                </button>
+                <button onclick="mudarFaseEliminatoria('r16')" id="fase-r16-btn" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 whitespace-nowrap">
+                    Oitavas
+                </button>
+                <button onclick="mudarFaseEliminatoria('qf')" id="fase-qf-btn" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 whitespace-nowrap">
+                    Quartas
+                </button>
+                <button onclick="mudarFaseEliminatoria('sf')" id="fase-sf-btn" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 whitespace-nowrap">
+                    Semi
+                </button>
+                <button onclick="mudarFaseEliminatoria('final')" id="fase-final-btn" class="flex-1 py-1.5 px-3 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 whitespace-nowrap">
+                    Final
+                </button>
+            </div>
+
+            <div id="confrontos-eliminatorios" class="space-y-3"></div>
+        </div>
+
+        <footer class="text-center mt-10 text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+            <p id="footer-texto">Carregando regulamento de pontos...</p>
+        </footer>
+    </main>
+
+    <!-- Modal: Raio-X do Mata-Mata -->
+    <div id="modal-palpites-mm" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-pointer" onclick="fecharModalPalpitesMataMata()"></div>
+        <div class="absolute bottom-0 left-0 right-0 top-12 sm:top-20 max-w-lg mx-auto bg-slate-50 dark:bg-slate-950 rounded-t-3xl shadow-2xl overflow-hidden flex flex-col transform translate-y-full transition-transform duration-300 ease-out" id="modal-palpites-content">
+            <div class="p-5 pb-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 z-10 sticky top-0">
+                <h2 class="font-extrabold text-slate-800 dark:text-slate-100 text-base sm:text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-chess-board text-emerald-500"></i> Raio-X do Mata-Mata
+                </h2>
+                <button onclick="fecharModalPalpitesMataMata()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto flex-1 hide-scroll space-y-3" id="modal-palpites-body">
+                <!-- Conteúdo inserido via JS -->
+            </div>
+            
+            <div class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 text-[10px] flex justify-center gap-4 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-emerald-500"></div> Acerto Orig.</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-blue-500"></div> Acerto S.C.</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-red-500"></div> Erro</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('dark-mode-icon').className = 'fa-solid fa-sun text-lg';
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('dark-mode-icon').className = 'fa-solid fa-moon text-lg';
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (!localStorage.getItem('theme')) {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                    document.getElementById('dark-mode-icon').className = 'fa-solid fa-sun text-lg';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.getElementById('dark-mode-icon').className = 'fa-solid fa-moon text-lg';
+                }
+            }
+        });
+
+        function alternarModoEscuro() {
+            const html = document.documentElement;
+            const icon = document.getElementById('dark-mode-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon text-lg';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-lg';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        const PALPITES_INTEGRADOS = [
+            { grupo: "A", time: "Mexico", Fruet: 1, Jacom: 1, Raio: 2, Gustavo: 1 },
+            { grupo: "A", time: "South Korea", Fruet: 2, Jacom: 2, Raio: 1, Gustavo: 3 },
+            { grupo: "A", time: "Czechia", Fruet: 3, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "A", time: "South Africa", Fruet: 4, Jacom: 3, Raio: 3, Gustavo: 2 },
+            { grupo: "B", time: "Switzerland", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 2 },
+            { grupo: "B", time: "Canada", Fruet: 2, Jacom: 2, Raio: 3, Gustavo: 1 },
+            { grupo: "B", time: "Qatar", Fruet: 3, Jacom: 3, Raio: 2, Gustavo: 3 },
+            { grupo: "B", time: "Bosnia and Herzegovina", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "C", time: "Brazil", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "C", time: "Morocco", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 2 },
+            { grupo: "C", time: "Scotland", Fruet: 3, Jacom: 3, Raio: 3, Gustavo: 3 },
+            { grupo: "C", time: "Haiti", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "D", time: "Turkey", Fruet: 1, Jacom: 3, Raio: 2, Gustavo: 4 },
+            { grupo: "D", time: "United States", Fruet: 2, Jacom: 2, Raio: 3, Gustavo: 3 },
+            { grupo: "D", time: "Paraguay", Fruet: 3, Jacom: 1, Raio: 1, Gustavo: 2 },
+            { grupo: "D", time: "Australia", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 1 },
+            { grupo: "E", time: "Germany", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "E", time: "Ivory Coast", Fruet: 2, Jacom: 3, Raio: 2, Gustavo: 3 },
+            { grupo: "E", time: "Ecuador", Fruet: 3, Jacom: 2, Raio: 3, Gustavo: 2 },
+            { grupo: "E", time: "Curaçao", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "F", time: "Netherlands", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "F", time: "Japan", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 2 },
+            { grupo: "F", time: "Tunisia", Fruet: 3, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "F", time: "Sweden", Fruet: 4, Jacom: 3, Raio: 3, Gustavo: 3 },
+            { grupo: "G", time: "Belgium", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 2 },
+            { grupo: "G", time: "Egypt", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 4 },
+            { grupo: "G", time: "Iran", Fruet: 3, Jacom: 3, Raio: 4, Gustavo: 1 },
+            { grupo: "G", time: "New Zealand", Fruet: 4, Jacom: 4, Raio: 3, Gustavo: 3 },
+            { grupo: "H", time: "Spain", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "H", time: "Uruguay", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 3 },
+            { grupo: "H", time: "Saudi Arabia", Fruet: 3, Jacom: 4, Raio: 3, Gustavo: 2 },
+            { grupo: "H", time: "Cape Verde", Fruet: 4, Jacom: 3, Raio: 4, Gustavo: 4 },
+            { grupo: "I", time: "France", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "I", time: "Norway", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 2 },
+            { grupo: "I", time: "Senegal", Fruet: 3, Jacom: 3, Raio: 3, Gustavo: 4 },
+            { grupo: "I", time: "Iraq", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 3 },
+            { grupo: "J", time: "Argentina", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "J", time: "Austria", Fruet: 2, Jacom: 3, Raio: 2, Gustavo: 2 },
+            { grupo: "J", time: "Algeria", Fruet: 3, Jacom: 2, Raio: 4, Gustavo: 4 },
+            { grupo: "J", time: "Jordan", Fruet: 4, Jacom: 4, Raio: 3, Gustavo: 3 },
+            { grupo: "K", time: "Portugal", Fruet: 1, Jacom: 1, Raio: 1, Gustavo: 1 },
+            { grupo: "K", time: "Colombia", Fruet: 2, Jacom: 2, Raio: 2, Gustavo: 2 },
+            { grupo: "K", time: "DR Congo", Fruet: 3, Jacom: 3, Raio: 3, Gustavo: 3 },
+            { grupo: "K", time: "Uzbekistan", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 4 },
+            { grupo: "L", time: "England", Fruet: 1, Jacom: 2, Raio: 2, Gustavo: 1 },
+            { grupo: "L", time: "Ghana", Fruet: 2, Jacom: 3, Raio: 3, Gustavo: 3 },
+            { grupo: "L", time: "Croatia", Fruet: 3, Jacom: 1, Raio: 1, Gustavo: 2 },
+            { grupo: "L", time: "Panama", Fruet: 4, Jacom: 4, Raio: 4, Gustavo: 4 }
+        ];
+
+        const PALPITES_MATA_MATA = {
+            'Fruet': { 
+                campeao: 'Spain', vice: 'Portugal', terceiro: 'France', quarto: 'Brazil',
+                r16: ['Germany', 'France', 'South Korea', 'Netherlands', 'Colombia', 'Spain', 'Turkey', 'Belgium', 'Brazil', 'Norway', 'Mexico', 'England', 'Argentina', 'Egypt', 'Switzerland', 'Portugal'],
+                qf: ['France', 'Netherlands', 'Spain', 'Belgium', 'Brazil', 'England', 'Argentina', 'Portugal'],
+                sf: ['France', 'Spain', 'Brazil', 'Portugal'],
+                segundaChance: {
+                    r16: ['Germany', 'France', 'Canada', 'Netherlands', 'Portugal', 'Spain', 'United States', 'Belgium', 'Brazil', 'Norway', 'Mexico', 'England', 'Argentina', 'Egypt', 'Switzerland', 'Colombia'],
+                    qf: ['France', 'Netherlands', 'Portugal', 'Belgium', 'Brazil', 'England', 'Argentina', 'Switzerland'],
+                    sf: ['France', 'Portugal', 'England', 'Argentina'],
+                    final: ['France', 'Argentina']
+                }
+            },
+            'Jacom': {
+                campeao: 'Brazil', vice: 'Spain', terceiro: 'France', quarto: 'Portugal',
+                r16: ['Germany', 'France', 'South Korea', 'Morocco', 'England', 'Spain', 'Paraguay', 'Belgium', 'Brazil', 'Norway', 'Mexico', 'Croatia', 'Argentina', 'Egypt', 'Switzerland', 'Portugal'],
+                qf: ['France', 'Morocco', 'Spain', 'Belgium', 'Brazil', 'Mexico', 'Argentina', 'Portugal'],
+                sf: ['France', 'Spain', 'Brazil', 'Portugal'],
+                segundaChance: {
+                    r16: ['Germany', 'France', 'South Africa', 'Morocco', 'Portugal', 'Spain', 'Bosnia and Herzegovina', 'Senegal', 'Brazil', 'Norway', 'England', 'Argentina', 'Egypt', 'Switzerland', 'Colombia', 'Mexico'],
+                    qf: ['France', 'Morocco', 'Spain', 'Senegal', 'Brazil', 'England', 'Argentina', 'Colombia'],
+                    sf: ['France', 'Spain', 'Brazil', 'Argentina'],
+                    final: ['France', 'Brazil']
+                }
+            },
+            'Raio': {
+                campeao: 'Spain', vice: 'Portugal', terceiro: 'France', quarto: 'Norway',
+                r16: ['Germany', 'France', 'Mexico', 'Netherlands', 'England', 'Spain', 'Paraguay', 'Belgium', 'Brazil', 'Norway', 'South Korea', 'Croatia', 'Argentina', 'Turkey', 'Switzerland', 'Portugal'],
+                qf: ['France', 'Netherlands', 'Spain', 'Belgium', 'Norway', 'Croatia', 'Argentina', 'Portugal'],
+                sf: ['France', 'Spain', 'Norway', 'Portugal'],
+                segundaChance: {
+                    r16: ['Germany', 'France', 'Canada', 'Netherlands', 'Croatia', 'Spain', 'United States', 'Belgium', 'Brazil', 'Norway', 'Mexico', 'England', 'Argentina', 'Egypt', 'Switzerland', 'Colombia'],
+                    qf: ['France', 'Netherlands', 'Spain', 'United States', 'Brazil', 'England', 'Argentina', 'Switzerland'],
+                    sf: ['France', 'Spain', 'Brazil', 'Argentina'],
+                    final: ['France', 'Argentina']
+                }
+            },
+            'Gustavo': {
+                campeao: 'Spain', vice: 'Argentina', terceiro: 'Netherlands', quarto: 'Japan',
+                r16: ['Germany', 'France', 'South Africa', 'Netherlands', 'Croatia', 'Spain', 'Qatar', 'Iran', 'Japan', 'Ecuador', 'Mexico', 'England', 'Argentina', 'Belgium', 'Canada', 'Portugal'],
+                qf: ['France', 'Netherlands', 'Spain', 'Iran', 'Japan', 'Mexico', 'Argentina', 'Portugal'],
+                sf: ['Netherlands', 'Spain', 'Japan', 'Argentina'],
+                segundaChance: {
+                    r16: ['Germany', 'France', 'Canada', 'Netherlands', 'Portugal', 'Spain', 'United States', 'Belgium', 'Brazil', 'Norway', 'Mexico', 'England', 'Argentina', 'Australia', 'Switzerland', 'Ghana'],
+                    qf: ['France', 'Netherlands', 'Spain', 'United States', 'Brazil', 'Mexico', 'Argentina', 'Switzerland'],
+                    sf: ['France', 'Spain', 'Mexico', 'Argentina'],
+                    final: ['Spain', 'Argentina']
+                }
+            }
+        };
+
+        const PAISES_TRADUZIDOS = {
+            'Mexico': 'México', 'South Korea': 'Coreia do Sul', 'Czechia': 'Tchéquia', 'South Africa': 'África do Sul',
+            'Switzerland': 'Suíça', 'Canada': 'Canadá', 'Qatar': 'Catar', 'Bosnia and Herzegovina': 'Bósnia e Herzegovina',
+            'Brazil': 'Brasil', 'Morocco': 'Marrocos', 'Scotland': 'Escócia', 'Haiti': 'Haiti',
+            'Turkey': 'Turquia', 'United States': 'Estados Unidos', 'Paraguay': 'Paraguai', 'Australia': 'Austrália',
+            'Germany': 'Alemanha', 'Ivory Coast': 'Costa do Marfim', 'Ecuador': 'Equador', 'Curaçao': 'Curaçao',
+            'Netherlands': 'Holanda', 'Japan': 'Japão', 'Tunisia': 'Tunísia', 'Sweden': 'Suécia',
+            'Belgium': 'Bélgica', 'Egypt': 'Egito', 'Iran': 'Irã', 'New Zealand': 'Nova Zelândia',
+            'Spain': 'Espanha', 'Uruguay': 'Uruguai', 'Saudi Arabia': 'Arábia Saudita', 'Cape Verde': 'Cabo Verde',
+            'France': 'França', 'Norway': 'Noruega', 'Senegal': 'Senegal', 'Iraq': 'Iraque',
+            'Argentina': 'Argentina', 'Austria': 'Áustria', 'Jordan': 'Jordânia', 'Algeria': 'Argélia',
+            'Portugal': 'Portugal', 'Colombia': 'Colômbia', 'DR Congo': 'RD Congo', 'Uzbekistan': 'Uzbequistão',
+            'Croatia': 'Croácia', 'England': 'Inglaterra', 'Ghana': 'Gana', 'Panama': 'Panamá'
+        };
+
+        const BANDEIRAS_MAP = {
+            'Mexico': '🇲🇽', 'South Korea': '🇰🇷', 'Czechia': '🇨🇿', 'South Africa': '🇿🇦',
+            'Switzerland': '🇨🇭', 'Canada': '🇨🇦', 'Qatar': '🇶🇦', 'Bosnia and Herzegovina': '🇧🇦', 'Bosnia-Herzegovina': '🇧🇦',
+            'Brazil': '🇧🇷', 'Morocco': '🇲🇦', 'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Haiti': '🇭🇹',
+            'Turkey': '🇹🇷', 'Türkiye': '🇹🇷', 'United States': '🇺🇸', 'USA': '🇺🇸', 'Paraguay': '🇵🇾', 'Australia': '🇦🇺',
+            'Germany': '🇩🇪', 'Ivory Coast': '🇨🇮', "Côte d'Ivoire": '🇨🇮', 'Ecuador': '🇪🇨', 'Curaçao': '🇨🇼',
+            'Netherlands': '🇳🇱', 'Japan': '🇯🇵', 'Tunisia': '🇹🇳', 'Sweden': '🇸🇪',
+            'Belgium': '🇧🇪', 'Egypt': '🇪🇬', 'Iran': '🇮🇷', 'IR Iran': '🇮🇷', 'New Zealand': '🇳🇿',
+            'Spain': '🇪🇸', 'Uruguay': '🇺🇾', 'Saudi Arabia': '🇸🇦', 'Cape Verde': '🇨🇻', 'Cabo Verde': '🇨🇻',
+            'France': '🇫🇷', 'Norway': '🇳🇴', 'Senegal': '🇸🇳', 'Iraq': '🇮🇶',
+            'Argentina': '🇦🇷', 'Austria': '🇦🇹', 'Algeria': '🇩🇿', 'Jordan': '🇯🇴',
+            'Portugal': '🇵🇹', 'Colombia': '🇨🇴', 'DR Congo': '🇨🇩', 'Congo DR': '🇨🇩', 'Uzbekistan': '🇺🇿',
+            'Croatia': '🇭🇷', 'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Ghana': '🇬🇭', 'Panama': '🇵🇦'
+        };
+
+        const AVATARES_INDIVIDUAL = {
+            'Fruet': '🇪🇸',
+            'Jacom': '🇧🇷',
+            'Raio': '🇪🇸',
+            'Gustavo': '🇪🇸'
+        };
+
+        const RESULTADOS_REAIS_FALLBACK = {
+            "A": {
+                "Mexico": { pos: 1, pj: 3, vit: 2, e: 1, der: 0, gm: 5, gc: 2, sg: "+3", pts: 7 },
+                "South Korea": { pos: 2, pj: 3, vit: 1, e: 1, der: 1, gm: 4, gc: 4, sg: "0", pts: 4 },
+                "Czechia": { pos: 3, pj: 3, vit: 1, e: 0, der: 2, gm: 3, gc: 4, sg: "-1", pts: 3 },
+                "South Africa": { pos: 4, pj: 3, vit: 0, e: 2, der: 1, gm: 2, gc: 4, sg: "-2", pts: 2 }
+            },
+            "B": {
+                "Switzerland": { pos: 1, pj: 3, vit: 3, e: 0, der: 0, gm: 6, gc: 1, sg: "+5", pts: 9 },
+                "Canada": { pos: 2, pj: 3, vit: 1, e: 1, der: 1, gm: 4, gc: 3, sg: "+1", pts: 4 },
+                "Qatar": { pos: 3, pj: 3, vit: 1, e: 0, der: 2, gm: 2, gc: 5, sg: "-3", pts: 3 },
+                "Bosnia and Herzegovina": { pos: 4, pj: 3, vit: 0, e: 1, der: 2, gm: 1, gc: 4, sg: "-3", pts: 1 }
+            }
+        };
+
+        const BASE_MATCHES = {
+            r32: [
+                { matchNum: 73, t1Raw: "África do Sul", t2Raw: "Canadá", local: "Los Angeles", data: "28 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "South Africa", t2: "Canada" },
+                { matchNum: 74, t1Raw: "Alemanha", t2Raw: "Paraguai", local: "Boston", data: "29 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Germany", t2: "Paraguay" },
+                { matchNum: 75, t1Raw: "Países Baixos", t2Raw: "Marrocos", local: "Monterrey", data: "29 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Netherlands", t2: "Morocco" },
+                { matchNum: 76, t1Raw: "Brasil", t2Raw: "Japão", local: "Houston", data: "29 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Brazil", t2: "Japan" },
+                { matchNum: 77, t1Raw: "França", t2Raw: "Suécia", local: "New York/New Jersey", data: "30 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "France", t2: "Sweden" },
+                { matchNum: 78, t1Raw: "Costa do Marfim", t2Raw: "Noruega", local: "Dallas", data: "30 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Ivory Coast", t2: "Norway" },
+                { matchNum: 79, t1Raw: "México", t2Raw: "Equador", local: "Cidade do México", data: "30 de JUN, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Mexico", t2: "Ecuador" },
+                { matchNum: 80, t1Raw: "Inglaterra", t2Raw: "RD Congo", local: "Atlanta", data: "1º de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "England", t2: "DR Congo" },
+                { matchNum: 81, t1Raw: "Estados Unidos", t2Raw: "Bósnia e Herzegovina", local: "San Francisco", data: "1º de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "United States", t2: "Bosnia and Herzegovina" },
+                { matchNum: 82, t1Raw: "Bélgica", t2Raw: "Senegal", local: "Seattle", data: "1º de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Belgium", t2: "Senegal" },
+                { matchNum: 83, t1Raw: "Portugal", t2Raw: "Croácia", local: "Toronto", data: "2 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Portugal", t2: "Croatia" },
+                { matchNum: 84, t1Raw: "Espanha", t2Raw: "Áustria", local: "Los Angeles", data: "2 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Spain", t2: "Austria" },
+                { matchNum: 85, t1Raw: "Suíça", t2Raw: "Argélia", local: "Vancouver", data: "2 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Switzerland", t2: "Algeria" },
+                { matchNum: 86, t1Raw: "Argentina", t2Raw: "Cabo Verde", local: "Miami", data: "3 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Argentina", t2: "Cape Verde" },
+                { matchNum: 87, t1Raw: "Colômbia", t2Raw: "Gana", local: "Kansas City", data: "3 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Colombia", t2: "Ghana" },
+                { matchNum: 88, t1Raw: "Austrália", t2Raw: "Egito", local: "Dallas", data: "3 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: "Australia", t2: "Egypt" }
+            ],
+            r16: [
+                { matchNum: 89, t1Raw: "Vencedor Jogo 74", t2Raw: "Vencedor Jogo 77", local: "Philadelphia", data: "4 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 90, t1Raw: "Vencedor Jogo 73", t2Raw: "Vencedor Jogo 75", local: "Houston", data: "4 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 91, t1Raw: "Vencedor Jogo 76", t2Raw: "Vencedor Jogo 78", local: "Dallas", data: "5 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 92, t1Raw: "Vencedor Jogo 79", t2Raw: "Vencedor Jogo 80", local: "Cidade do México", data: "5 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 93, t1Raw: "Vencedor Jogo 83", t2Raw: "Vencedor Jogo 84", local: "Toronto", data: "6 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 94, t1Raw: "Vencedor Jogo 81", t2Raw: "Vencedor Jogo 82", local: "San Francisco", data: "6 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 95, t1Raw: "Vencedor Jogo 86", t2Raw: "Vencedor Jogo 88", local: "Atlanta", data: "7 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 96, t1Raw: "Vencedor Jogo 85", t2Raw: "Vencedor Jogo 87", local: "Seattle", data: "7 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null }
+            ],
+            qf: [
+                { matchNum: 97, t1Raw: "Vencedor Jogo 89", t2Raw: "Vencedor Jogo 90", local: "Kansas City", data: "9 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 98, t1Raw: "Vencedor Jogo 93", t2Raw: "Vencedor Jogo 94", local: "Boston", data: "10 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 99, t1Raw: "Vencedor Jogo 91", t2Raw: "Vencedor Jogo 92", local: "Los Angeles", data: "10 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 100, t1Raw: "Vencedor Jogo 95", t2Raw: "Vencedor Jogo 96", local: "Miami", data: "11 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null }
+            ],
+            sf: [
+                { matchNum: 101, t1Raw: "Vencedor Jogo 97", t2Raw: "Vencedor Jogo 98", local: "Dallas", data: "14 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null },
+                { matchNum: 102, t1Raw: "Vencedor Jogo 99", t2Raw: "Vencedor Jogo 100", local: "Atlanta", data: "15 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null }
+            ],
+            final: [
+                { matchNum: 104, t1Raw: "Vencedor Jogo 101", t2Raw: "Vencedor Jogo 102", local: "New York/New Jersey", data: "19 de JUL, 2026", gols1: null, gols2: null, pen1: null, pen2: null, vencedor: null, t1: null, t2: null }
+            ]
+        };
+
+        let dbJogadores = [];
+        let standingsReais = JSON.parse(JSON.stringify(RESULTADOS_REAIS_FALLBACK)); 
+        let matchesByPhase = JSON.parse(JSON.stringify(BASE_MATCHES));
+        let jogosGrupos = { A: [], B: [], C: [], D: [], E: [], F: [], G: [], H: [], I: [], J: [], K: [], L: [] };
+        let faseEliminatoriaAtiva = 'r32';
+        let todasPartidasGruposJogadas = false;
+
+        function traduzirPlaceholder(nome) {
+            if (!nome) return "";
+            let n = nome.trim();
+            n = n.replace(/Winner Group\s+([A-L])/gi, "Vencedor Grupo $1");
+            n = n.replace(/Runner-up Group\s+([A-L])/gi, "2º Grupo $1");
+            n = n.replace(/3rd Group\s+([A-L\/]+)/gi, "3º Grupo $1");
+            n = n.replace(/3rd Group\s+([A-L])/gi, "3º Grupo $1");
+            n = n.replace(/Winner Match\s+([0-9]+)/gi, "Vencedor Jogo $1");
+            n = n.replace(/Runner-up/gi, "2º colocado");
+            n = n.replace(/Winner/gi, "Vencedor");
+            return n;
+        }
+
+        function traduzirData(dataStr) {
+            if (!dataStr) return "A Definir";
+            let res = dataStr.trim();
+            const mesesMap = {
+                'january': 'JAN', 'february': 'FEV', 'march': 'MAR', 'april': 'ABR', 'may': 'MAI', 
+                'june': 'JUN', 'july': 'JUL', 'august': 'AGO', 'september': 'SET', 
+                'october': 'OUT', 'november': 'NOV', 'december': 'DEZ',
+                'janeiro': 'JAN', 'fevereiro': 'FEV', 'março': 'MAR', 'abril': 'ABR', 'maio': 'MAI',
+                'junho': 'JUN', 'julho': 'JUL', 'agosto': 'AGO', 'setembro': 'SET',
+                'outubro': 'OUT', 'novembro': 'NOV', 'dezembro': 'DEZ'
+            };
+
+            let day = null;
+            let monthAbbr = "JUN";
+            let year = "2026";
+            const cleanStr = res.replace(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Segunda-feira|Terça-feira|Quarta-feira|Quinta-feira|Sexta-feira|Sábado|Domingo)[,\s]*/i, '').trim();
+
+            let m = cleanStr.match(/(\d{1,2})\s+([a-zA-Zçõ]+)\s+(\d{4})/i); 
+            if (!m) m = cleanStr.match(/([a-zA-Zçõ]+)\s+(\d{1,2}),?\s+(\d{4})/i); 
+            if (!m) m = cleanStr.match(/(\d{1,2})\s+([a-zA-Zçõ]+)/i); 
+            if (!m) m = cleanStr.match(/([a-zA-Zçõ]+)\s+(\d{1,2})/i); 
+
+            if (m) {
+                if (isNaN(m[1])) {
+                    const mStr = m[1].toLowerCase().replace(/^de\s+/i, '').trim();
+                    monthAbbr = mesesMap[mStr] || "JUN";
+                    day = parseInt(m[2]);
+                    if (m[3]) year = m[3];
+                } else {
+                    day = parseInt(m[1]);
+                    const mStr = m[2].toLowerCase().replace(/^de\s+/i, '').trim();
+                    monthAbbr = mesesMap[mStr] || "JUN";
+                    if (m[3]) year = m[3];
+                }
+            }
+            if (day !== null) return `${day} de ${monthAbbr}, ${year}`;
+            return res;
+        }
+
+        function traduzirLocal(localStr) {
+            if (!localStr) return "A Definir";
+            let res = localStr.trim();
+            if (res.includes(',')) {
+                const parts = res.split(',');
+                res = parts[1].trim();
+            }
+            const substituicoes = {
+                'Mexico City': 'Cidade do México', 'Philadelphia': 'Filadélfia', 'San Francisco': 'São Francisco',
+                'New York': 'Nova York', 'New Jersey': 'Nova Jersey', 'East Rutherford': 'East Rutherford',
+                'Los Angeles': 'Los Angeles', 'Inglewood': 'Inglewood', 'Santa Clara': 'Santa Clara',
+                'Foxborough': 'Foxborough', 'Arlington': 'Arlington', 'Vancouver': 'Vancouver',
+                'Toronto': 'Toronto', 'Miami Gardens': 'Miami Gardens', 'Kansas City': 'Kansas City',
+                'Atlanta': 'Atlanta', 'Houston': 'Houston', 'Seattle': 'Seattle',
+                'Guadalajara': 'Guadalajara', 'Monterrey': 'Monterrey', 'Boston': 'Boston', 'Dallas': 'Dallas'
+            };
+            res = res.replace(/Stadium|Estadio|Estádio|Arena|BMO Field|BC Place|Lumen Field|Lincoln Financial Field/gi, '').trim();
+            for (const [en, pt] of Object.entries(substituicoes)) {
+                if (res.toLowerCase().includes(en.toLowerCase())) return pt;
+            }
+            return res || "A Definir";
+        }
+
+        window.mudarAba = function(aba) {
+            document.getElementById('aba-ranking').classList.add('hidden');
+            document.getElementById('aba-jogos').classList.add('hidden');
+            document.getElementById('aba-matamata').classList.add('hidden');
+            
+            document.getElementById('tab-ranking-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 whitespace-nowrap';
+            document.getElementById('tab-jogos-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 whitespace-nowrap';
+            document.getElementById('tab-matamata-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1 whitespace-nowrap';
+
+            if (aba === 'ranking') {
+                document.getElementById('aba-ranking').classList.remove('hidden');
+                document.getElementById('tab-ranking-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 whitespace-nowrap';
+            } else if (aba === 'jogos') {
+                document.getElementById('aba-jogos').classList.remove('hidden');
+                document.getElementById('tab-jogos-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 whitespace-nowrap';
+                renderizarVisualizacaoGrupos();
+            } else if (aba === 'matamata') {
+                document.getElementById('aba-matamata').classList.remove('hidden');
+                document.getElementById('tab-matamata-btn').className = 'flex-1 py-2 px-3 text-xs sm:text-sm font-bold rounded-lg text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 flex items-center justify-center gap-1 whitespace-nowrap';
+                renderizarFaseEliminatoria();
+            }
+        };
+
+        window.mudarFaseEliminatoria = function(fase) {
+            faseEliminatoriaAtiva = fase;
+            const fases = ['r32', 'r16', 'qf', 'sf', 'final'];
+            fases.forEach(f => {
+                const btn = document.getElementById(`fase-${f}-btn`);
+                btn.className = 'flex-1 py-1.5 px-3 text-xs font-bold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-200 whitespace-nowrap';
+            });
+            const btnAtivo = document.getElementById(`fase-${fase}-btn`);
+            btnAtivo.className = 'flex-1 py-1.5 px-3 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-400 shadow-sm transition-all duration-200 whitespace-nowrap';
+            
+            renderizarFaseEliminatoria();
+        };
+
+        function normalizarNomePais(nome) {
+            if (!nome) return "";
+            let limpo = nome.replace(/\s*\(H\)\s*/i, '')
+                            .replace(/\s*\(A\)\s*/i, '')
+                            .replace(/\s*\(Q\)\s*/i, '')
+                            .replace(/\s*\(X\)\s*/i, '')
+                            .replace(/\s*\(Y\)\s*/i, '')
+                            .trim();
+
+            const mapa = {
+                'Czech Republic': 'Czechia', 'República Checa': 'Czechia', 'Tchéquia': 'Czechia',
+                'República Tcheca': 'Czechia', 'CZE': 'Czechia',
+                'Türkiye': 'Turkey', 'Turquia': 'Turkey', 'United States': 'United States',
+                'USA': 'United States', 'Estados Unidos': 'United States', 'Republic of the Congo': 'DR Congo',
+                'Congo DR': 'DR Congo', 'RD Congo': 'DR Congo', 'COD': 'DR Congo', 'Cabo Verde': 'Cape Verde',
+                'Cape Verde': 'Cape Verde', 'CPV': 'Cape Verde', 'Ivory Coast': 'Ivory Coast', "Côte d'Ivoire": 'Ivory Coast',
+                'Costa do Marfim': 'Ivory Coast', 'CIV': 'Ivory Coast', 'Korea Republic': 'South Korea', 'Coreia do Sul': 'South Korea',
+                'KOR': 'South Korea', 'IR Iran': 'Iran', 'Iran': 'Iran', 'Irã': 'Iran', 'IRN': 'Iran', 'Bosnia-Herzegovina': 'Bosnia and Herzegovina',
+                'Bósnia e Herzegovina': 'Bosnia and Herzegovina', 'Bosnia and Herzegovina': 'Bosnia and Herzegovina', 'BIH': 'Bosnia and Herzegovina'
+            };
+            return mapa[limpo] || limpo;
+        }
+
+        async function carregarTabelasGrupoWikipedia() {
+            try {
+                const wikiUrl = 'https://en.wikipedia.org/w/api.php?action=parse&page=Template:2026_FIFA_World_Cup_group_tables&format=json&origin=*';
+                const resposta = await fetch(wikiUrl);
+                const dados = await resposta.json();
+                const htmlWiki = dados.parse.text['*'];
+
+                const parser = new DOMParser();
+                const docWiki = parser.parseFromString(htmlWiki, 'text/html');
+                const tabelasWiki = docWiki.querySelectorAll('table.wikitable');
+
+                if (tabelasWiki.length >= 12) {
+                    const novasClassificacoes = {};
+                    const gruposLetras = 'ABCDEFGHIJKL'.split('');
+
+                    for (let g = 0; g < 12; g++) {
+                        const letra = gruposLetras[g];
+                        novasClassificacoes[letra] = {};
+
+                        const linhasTabela = tabelasWiki[g].querySelectorAll('tbody tr');
+                        let currentRank = 1;
+
+                        linhasTabela.forEach(row => {
+                            const cells = Array.from(row.querySelectorAll('th, td'));
+                            if (cells.length < 8) return;
+
+                            let teamName = "";
+                            let teamCellIndex = 1;
+
+                            for (let idx = 0; idx < cells.length; idx++) {
+                                const link = cells[idx].querySelector('a');
+                                if (link && (link.title?.includes('national football team') || link.title?.includes('national soccer team') || BANDEIRAS_MAP[normalizarNomePais(link.textContent.trim())])) {
+                                    teamName = normalizarNomePais(link.textContent.trim());
+                                    teamCellIndex = idx;
+                                    break;
+                                }
+                            }
+
+                            if (!teamName) return;
+
+                            let rankTexto = cells[0].textContent.trim();
+                            let rankVal = parseInt(rankTexto);
+                            if (isNaN(rankVal)) {
+                                rankVal = currentRank;
+                            } else {
+                                currentRank = rankVal;
+                            }
+
+                            let isClassificado = false;
+                            let isEliminado = false;
+                            const textRow = row.textContent;
+                            if (textRow.includes('(Q)') || textRow.includes('(A)') || textRow.includes('(C)')) {
+                                isClassificado = true;
+                            }
+                            if (textRow.includes('(E)')) {
+                                isEliminado = true;
+                            }
+                            const bgStyle = cells[0].style.backgroundColor || row.style.backgroundColor || '';
+                            if (bgStyle.includes('ccffcc') || bgStyle.includes('204, 255, 204') || bgStyle.includes('170, 255, 170')) {
+                                isClassificado = true;
+                            }
+                            if (bgStyle.includes('ffcccc') || bgStyle.includes('255, 204, 204') || bgStyle.includes('255, 170, 170')) {
+                                isEliminado = true;
+                            }
+
+                            if (teamName === 'South Africa') {
+                                isClassificado = true;
+                                isEliminado = false;
+                            }
+
+                            try {
+                                const pj = parseInt(cells[teamCellIndex + 1]?.textContent.trim()) || 0;
+                                const vit = parseInt(cells[teamCellIndex + 2]?.textContent.trim()) || 0;
+                                const e = parseInt(cells[teamCellIndex + 3]?.textContent.trim()) || 0;
+                                const der = parseInt(cells[teamCellIndex + 4]?.textContent.trim()) || 0;
+                                const gm = parseInt(cells[teamCellIndex + 5]?.textContent.trim()) || 0;
+                                const gc = parseInt(cells[teamCellIndex + 6]?.textContent.trim()) || 0;
+                                
+                                const sgRaw = cells[teamCellIndex + 7]?.textContent.replace(/−/g, '-').replace('&minus;', '-').trim() || "0";
+                                const pts = parseInt(cells[teamCellIndex + 8]?.textContent.trim()) || 0;
+
+                                novasClassificacoes[letra][teamName] = {
+                                    pos: rankVal, pj, vit, e, der, gm, gc, sg: sgRaw, pts, classificado: isClassificado, eliminado: isEliminado
+                                };
+                            } catch (err) {
+                                novasClassificacoes[letra][teamName] = {
+                                    pos: rankVal, pj: 0, vit: 0, e: 0, der: 0, gm: 0, gc: 0, sg: "0", pts: 0, classificado: isClassificado, eliminado: isEliminado
+                                };
+                            }
+                        });
+                    }
+                    standingsReais = novasClassificacoes;
+                }
+            } catch (e) {
+                console.error("Falha ao sincronizar com as tabelas da Wikipédia.", e);
+            }
+        }
+
+        async function carregarJogosGruposWikipedia() {
+            try {
+                const res = await fetch('https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup&format=json&origin=*');
+                const data = await res.json();
+                if (!data.parse || !data.parse.text) return;
+                const html = data.parse.text['*'];
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                const boxes = doc.querySelectorAll('.footballbox');
+                boxes.forEach(box => {
+                    let t1Node = box.querySelector('.fhome, .home, [itemprop="homeTeam"]');
+                    let t2Node = box.querySelector('.faway, .away, [itemprop="awayTeam"]');
+                    
+                    let t1Raw = t1Node ? t1Node.textContent.trim() : '';
+                    let t2Raw = t2Node ? t2Node.textContent.trim() : '';
+                    
+                    let t1Norm = normalizarNomePais(t1Raw);
+                    let t2Norm = normalizarNomePais(t2Raw);
+
+                    if (t1Norm && t2Norm) {
+                        let grupo = null;
+                        for (let g of Object.keys(standingsReais)) {
+                            if (standingsReais[g] && standingsReais[g][t1Norm] && standingsReais[g][t2Norm]) {
+                                grupo = g;
+                                break;
+                            }
+                        }
+
+                        if (grupo) {
+                            let scoreNode = box.querySelector('.fscore, .score, [itemprop="score"]');
+                            let scoreText = scoreNode ? scoreNode.textContent.trim() : '';
+                            let gols1 = null;
+                            let gols2 = null;
+
+                            const cleanScore = scoreText.replace(/\s+/g, '');
+                            if (cleanScore.includes('–')) {
+                                const parts = cleanScore.split('–');
+                                gols1 = parseInt(parts[0]);
+                                gols2 = parseInt(parts[1]);
+                            } else if (cleanScore.includes('-')) {
+                                const parts = cleanScore.split('-');
+                                gols1 = parseInt(parts[0]);
+                                gols2 = parseInt(parts[1]);
+                            }
+                            if (isNaN(gols1)) gols1 = null;
+                            if (isNaN(gols2)) gols2 = null;
+
+                            if(!jogosGrupos[grupo]) jogosGrupos[grupo] = [];
+                            
+                            const exists = jogosGrupos[grupo].some(j => (j.t1 === t1Norm && j.t2 === t2Norm) || (j.t1 === t2Norm && j.t2 === t1Norm));
+                            if(!exists) {
+                                jogosGrupos[grupo].push({
+                                    t1: t1Norm,
+                                    t2: t2Norm,
+                                    gols1: gols1,
+                                    gols2: gols2
+                                });
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Erro ao buscar jogos dos grupos:", e);
+            }
+
+            Object.keys(standingsReais).forEach(grupo => {
+                if (!jogosGrupos[grupo]) jogosGrupos[grupo] = [];
+                if (jogosGrupos[grupo].length === 0) {
+                    const teams = Object.keys(standingsReais[grupo]);
+                    if (teams.length >= 4) {
+                        jogosGrupos[grupo].push({ t1: teams[0], t2: teams[1], gols1: null, gols2: null });
+                        jogosGrupos[grupo].push({ t1: teams[2], t2: teams[3], gols1: null, gols2: null });
+                        jogosGrupos[grupo].push({ t1: teams[0], t2: teams[2], gols1: null, gols2: null });
+                        jogosGrupos[grupo].push({ t1: teams[3], t2: teams[1], gols1: null, gols2: null });
+                        jogosGrupos[grupo].push({ t1: teams[3], t2: teams[0], gols1: null, gols2: null });
+                        jogosGrupos[grupo].push({ t1: teams[1], t2: teams[2], gols1: null, gols2: null });
+                    }
+                }
+            });
+        }
+
+        function encontrarPartidaPorNumero(num) {
+            for (const fase of Object.values(matchesByPhase)) {
+                const match = fase.find(x => x.matchNum === num);
+                if (match) return match;
+            }
+            return null;
+        }
+
+        function encontrarPartidaPorTimes(teamA, teamB) {
+            for (const fase of Object.values(matchesByPhase)) {
+                for (const m of fase) {
+                    if (m.t1 === teamA && m.t2 === teamB) return { partida: m, isFlipped: false };
+                    if (m.t1 === teamB && m.t2 === teamA) return { partida: m, isFlipped: true };
+                }
+            }
+            return null;
+        }
+
+        function atualizarChaveamentoDinamicamente() {
+            const bracketMap = {
+                89: [74, 77], 90: [73, 75], 91: [76, 78], 92: [79, 80],
+                93: [83, 84], 94: [81, 82], 95: [86, 88], 96: [85, 87],
+                97: [89, 90], 98: [93, 94], 99: [91, 92], 100: [95, 96],
+                101: [97, 98], 102: [99, 100], 104: [101, 102]
+            };
+            
+            for (const fase of Object.values(matchesByPhase)) {
+                for (const m of fase) {
+                    if (m.gols1 !== null && m.gols2 !== null) {
+                        if (m.gols1 > m.gols2) m.vencedor = m.t1;
+                        else if (m.gols2 > m.gols1) m.vencedor = m.t2;
+                        else if (m.pen1 !== null && m.pen2 !== null) {
+                            m.vencedor = (m.pen1 > m.pen2) ? m.t1 : m.t2;
+                        } else {
+                            m.vencedor = null; 
+                        }
+                    }
+                }
+            }
+
+            for (const [targetId, sources] of Object.entries(bracketMap)) {
+                const targetMatch = encontrarPartidaPorNumero(parseInt(targetId));
+                if (targetMatch) {
+                    const src1 = encontrarPartidaPorNumero(sources[0]);
+                    const src2 = encontrarPartidaPorNumero(sources[1]);
+                    
+                    if (src1 && src1.vencedor) targetMatch.t1 = src1.vencedor;
+                    if (src2 && src2.vencedor) targetMatch.t2 = src2.vencedor;
+                }
+            }
+        }
+
+        async function carregarMataMataWikipedia() {
+            try {
+                const res = await fetch('https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_knockout_stage&format=json&origin=*');
+                const data = await res.json();
+                if (!data.parse || !data.parse.text) return;
+                const html = data.parse.text['*'];
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                const elements = doc.querySelectorAll('h2, h3, h4, .vevent, table.vevent, div.footballbox');
+                const nodesData = [];
+                
+                elements.forEach(node => {
+                    if (!node.tagName.startsWith('H')) {
+                        let t1Node = node.querySelector('.fhome, .home, [itemprop="homeTeam"]');
+                        let t2Node = node.querySelector('.faway, .away, [itemprop="awayTeam"]');
+                        
+                        let t1Raw = t1Node ? t1Node.textContent.trim() : '';
+                        let t2Raw = t2Node ? t2Node.textContent.trim() : '';
+                        
+                        let t1Norm = normalizarNomePais(t1Raw);
+                        let t2Norm = normalizarNomePais(t2Raw);
+                        
+                        if (t1Raw && t2Raw) {
+                            let scoreNode = node.querySelector('.fscore, .score, [itemprop="score"]');
+                            let scoreText = scoreNode ? scoreNode.textContent.trim() : '';
+                            let gols1 = null;
+                            let gols2 = null;
+                            
+                            const cleanScore = scoreText.replace(/\s+/g, '');
+                            if (cleanScore.includes('–')) {
+                                const parts = cleanScore.split('–');
+                                gols1 = parseInt(parts[0]);
+                                gols2 = parseInt(parts[1]);
+                            } else if (cleanScore.includes('-')) {
+                                const parts = cleanScore.split('-');
+                                gols1 = parseInt(parts[0]);
+                                gols2 = parseInt(parts[1]);
+                            }
+                            if (isNaN(gols1)) gols1 = null;
+                            if (isNaN(gols2)) gols2 = null;
+
+                            // Tratamento Ultrarrobusto de Pênaltis
+                            let pen1 = null, pen2 = null;
+                            
+                            // 1. Busca por (X-Y p) direto no placar principal
+                            let scoreTextStr = scoreText || '';
+                            let pMatch = scoreTextStr.match(/\((\d+)\s*[-–]\s*(\d+)\s*(?:p|pen|pên)?\.?\)/i);
+                            
+                            if (pMatch) {
+                                pen1 = parseInt(pMatch[1]);
+                                pen2 = parseInt(pMatch[2]);
+                            } else {
+                                // 2. Busca dentro da tabela/seção específica de pênaltis (.fpenalties)
+                                let penNodes = node.querySelectorAll('.fpenalties *, tr.fpenalties *');
+                                for (let pNode of penNodes) {
+                                    // Procura um elemento que tenha exatamente apenas o placar (ex: "4–3")
+                                    if (/^\s*\d+\s*[-–]\s*\d+\s*$/.test(pNode.textContent)) {
+                                        let penMatch = pNode.textContent.match(/(\d+)\s*[-–]\s*(\d+)/);
+                                        if (penMatch) {
+                                            pen1 = parseInt(penMatch[1]);
+                                            pen2 = parseInt(penMatch[2]);
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // 3. Fallback: Procura no texto bruto logo após a palavra "penalties" (ignora quebras de linha)
+                                if (pen1 === null || pen2 === null) {
+                                    const textLower = (node.textContent || '').toLowerCase();
+                                    let pMatch3 = textLower.match(/(?:penalties|pênaltis|penáltis|g\.p\.|pen\.|pên\.)[\s\S]{0,300}?(\d+)\s*[-–]\s*(\d+)/);
+                                    if (pMatch3) {
+                                       pen1 = parseInt(pMatch3[1]);
+                                       pen2 = parseInt(pMatch3[2]);
+                                    }
+                                }
+                            }
+                            
+                            let matchNum = null;
+                            const matchText = node.textContent || '';
+                            
+                            if (node.id) {
+                                const mId = node.id.match(/(?:Match|Match_)\s*(\d+)/i);
+                                if (mId) matchNum = parseInt(mId[1]);
+                            }
+                            if (!matchNum) {
+                                let cleanText = matchText.replace(/Winner Match \d+/gi, '').replace(/Loser Match \d+/gi, '');
+                                const matchMatch = cleanText.match(/Match\s+(7[3-9]|8[0-9]|9[0-9]|10[0-4])/i);
+                                if (matchMatch) matchNum = parseInt(matchMatch[1]);
+                            }
+
+                            nodesData.push({ t1Norm, t2Norm, gols1, gols2, pen1, pen2, matchNum });
+                        }
+                    }
+                });
+
+                for (let iter = 0; iter < 3; iter++) {
+                    atualizarChaveamentoDinamicamente();
+
+                    nodesData.forEach(data => {
+                        let matchObj = null;
+                        let isFlipped = false;
+
+                        if (data.matchNum) {
+                            matchObj = encontrarPartidaPorNumero(data.matchNum);
+                            if (matchObj && matchObj.t1 === data.t2Norm && matchObj.t2 === data.t1Norm) {
+                                isFlipped = true;
+                            }
+                        }
+                        
+                        if (!matchObj && data.t1Norm && data.t2Norm) {
+                            let resultadoPorTimes = encontrarPartidaPorTimes(data.t1Norm, data.t2Norm);
+                            if (resultadoPorTimes) {
+                                matchObj = resultadoPorTimes.partida;
+                                isFlipped = resultadoPorTimes.isFlipped;
+                                data.matchNum = matchObj.matchNum;
+                            }
+                        }
+
+                        if (matchObj && data.gols1 !== null) {
+                            if (isFlipped) {
+                                matchObj.gols1 = data.gols2; matchObj.gols2 = data.gols1;
+                                matchObj.pen1 = data.pen2; matchObj.pen2 = data.pen1;
+                            } else {
+                                matchObj.gols1 = data.gols1; matchObj.gols2 = data.gols2;
+                                matchObj.pen1 = data.pen1; matchObj.pen2 = data.pen2;
+                            }
+                        }
+                    });
+                }
+                atualizarChaveamentoDinamicamente(); 
+            } catch (e) {
+                console.error("Erro ao carregar o mata-mata da Wikipédia:", e);
+            }
+        }
+
+        async function inicializarSistema() {
+            const statusTexto = document.getElementById('status-texto');
+            const statusPing = document.getElementById('status-ping');
+            const statusPonto = document.getElementById('status-ponto');
+            
+            statusTexto.innerText = "Sincronizando com Wikipédia...";
+            statusPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75";
+            statusPonto.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
+
+            await carregarTabelasGrupoWikipedia();
+            await carregarJogosGruposWikipedia();
+            await carregarMataMataWikipedia();
+
+            statusTexto.innerText = "Wikipédia (Ao Vivo)";
+            statusPonto.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+
+            const gruposChaves = 'ABCDEFGHIJKL'.split('');
+            let gruposTerminados = true;
+            gruposChaves.forEach(g => {
+                if (!standingsReais[g]) {
+                    gruposTerminados = false;
+                } else {
+                    const times = Object.values(standingsReais[g]);
+                    if (times.length < 4) {
+                        gruposTerminados = false;
+                    } else {
+                        times.forEach(t => {
+                            if (t.pj < 3) gruposTerminados = false;
+                        });
+                    }
+                }
+            });
+
+            todasPartidasGruposJogadas = gruposTerminados;
+
+            const footer = document.getElementById('footer-texto');
+            footer.innerHTML = `
+                <strong class="text-slate-500 dark:text-slate-400">Regras de Pontuação:</strong><br>
+                <span class="opacity-80 leading-tight block mt-1">
+                    <strong>Grupos:</strong> 50 pts (posição exata), +30 pts (por gabarito).<br>
+                    <strong>Mata-Mata:</strong> 20 pts (Oitavas), 30 pts (Quartas), 40 pts (Semi),<br>75 pts (Final), 100 pts (Campeão).<br>
+                    <strong>Segunda Chance:</strong> 10 pts (Oitavas), 15 pts (Quartas),<br>20 pts (Semi), 40 pts (Final).
+                </span>
+            `;
+
+            processarPalpitesEGerarRanking();
+        }
+
+        function processarPalpitesEGerarRanking() {
+            const nomesParticipantes = ['Fruet', 'Jacom', 'Raio', 'Gustavo'];
+
+            const jogadores = nomesParticipantes.map(nome => ({
+                nome,
+                flagEmoji: AVATARES_INDIVIDUAL[nome] || '🏳️',
+                pontosSimples: 0,
+                pontosOficiais: 0,
+                pontosGrupoAntigo: 0, 
+                pontosGrupoNovo: 0,   
+                pontosBonusGrupo: 0,  
+                pontosMataMata: 0,    
+                rank: 1,
+                grupos: {},
+                matamata: PALPITES_MATA_MATA[nome] || {}
+            }));
+
+            PALPITES_INTEGRADOS.forEach(p => {
+                const grupo = p.grupo;
+                const time = p.time;
+                const statusReal = standingsReais[grupo]?.[time] || standingsReais[grupo]?.[normalizarNomePais(time)];
+                const rankReal = statusReal ? statusReal.pos : null;
+
+                let grupoIniciado = false;
+                if (standingsReais[grupo]) {
+                    grupoIniciado = Object.values(standingsReais[grupo]).some(t => t.pj > 0);
+                }
+
+                jogadores.forEach(jogador => {
+                    const predPos = p[jogador.nome];
+                    if (predPos !== undefined) {
+                        const correto = (grupoIniciado && rankReal !== null && predPos === rankReal);
+
+                        if (!jogador.grupos[grupo]) jogador.grupos[grupo] = [];
+                        jogador.grupos[grupo].push({
+                            selecao: time,
+                            palpite: predPos,
+                            real: grupoIniciado ? rankReal : null,
+                            correto
+                        });
+                    }
+                });
+            });
+
+            jogadores.forEach(j => {
+                Object.keys(j.grupos).forEach(grupo => {
+                    let totalAcertosNoGrupo = 0;
+                    j.grupos[grupo].forEach(p => {
+                        if (p.correto) {
+                            j.pontosGrupoAntigo += 1;
+                            j.pontosGrupoNovo += 50;
+                            totalAcertosNoGrupo++;
+                        }
+                    });
+                    if (totalAcertosNoGrupo === 4) {
+                        j.pontosBonusGrupo += 30; 
+                    }
+                });
+
+                const mm = j.matamata;
+                if (mm) {
+                    const sc = mm.segundaChance;
+                    
+                    matchesByPhase.r32.forEach(m => {
+                        if (m.vencedor) {
+                            if (mm.r16 && mm.r16.includes(m.vencedor)) j.pontosMataMata += 20;
+                            if (sc && sc.r16 && sc.r16.includes(m.vencedor)) j.pontosMataMata += 10;
+                        }
+                    });
+
+                    matchesByPhase.r16.forEach(m => {
+                        if (m.vencedor) {
+                            if (mm.qf && mm.qf.includes(m.vencedor)) j.pontosMataMata += 30;
+                            if (sc && sc.qf && sc.qf.includes(m.vencedor)) j.pontosMataMata += 15;
+                        }
+                    });
+
+                    matchesByPhase.qf.forEach(m => {
+                        if (m.vencedor) {
+                            if (mm.sf && mm.sf.includes(m.vencedor)) j.pontosMataMata += 40;
+                            if (sc && sc.sf && sc.sf.includes(m.vencedor)) j.pontosMataMata += 20;
+                        }
+                    });
+
+                    matchesByPhase.sf.forEach(m => {
+                        if (m.vencedor) {
+                            if (mm.campeao === m.vencedor || mm.vice === m.vencedor) j.pontosMataMata += 75;
+                            if (sc && sc.final && sc.final.includes(m.vencedor)) j.pontosMataMata += 40;
+                        }
+                    });
+
+                    if (mm.campeao) {
+                        matchesByPhase.final.forEach(m => {
+                            if (m.matchNum === 104 && m.vencedor) {
+                                if (mm.campeao === m.vencedor) j.pontosMataMata += 100;
+                            }
+                        });
+                    }
+                }
+
+                j.pontosSimples = j.pontosGrupoAntigo;
+                j.pontosOficiais = j.pontosGrupoNovo + j.pontosBonusGrupo + j.pontosMataMata;
+            });
+
+            jogadores.forEach(j => {
+                Object.keys(j.grupos).sort().forEach(g => {
+                    j.grupos[g].sort((a,b) => a.palpite - b.palpite);
+                });
+            });
+
+            jogadores.sort((a, b) => b.pontosOficiais - a.pontosOficiais);
+
+            let currentRank = 1;
+            let currentScore = -1;
+            jogadores.forEach((j, index) => {
+                if (j.pontosOficiais !== currentScore) {
+                    currentRank = index + 1;
+                    currentScore = j.pontosOficiais;
+                }
+                j.rank = currentRank;
+            });
+
+            dbJogadores = jogadores;
+            montarTelaRanking();
+        }
+
+        function obterBandeira(nome) {
+            return BANDEIRAS_MAP[nome] || '⚽';
+        }
+
+        function montarTelaRanking() {
+            const rankingList = document.getElementById('ranking-list');
+            rankingList.innerHTML = '';
+
+            dbJogadores.forEach((pessoa, index) => {
+                const li = document.createElement('li');
+                const uniqueId = `user-${index}`;
+
+                let corPos = 'text-slate-400 dark:text-slate-500';
+                let iconePos = `${pessoa.rank}º`;
+                if (pessoa.rank === 1) { corPos = 'text-yellow-500 font-extrabold'; iconePos = '🥇'; }
+                else if (pessoa.rank === 2) { corPos = 'text-blue-500 dark:text-blue-400 font-bold'; iconePos = '🥈'; }
+                else if (pessoa.rank === 3) { corPos = 'text-amber-600 font-bold'; iconePos = '🥉'; }
+
+                let palpitesHTML = '';
+                const mm = pessoa.matamata;
+                
+                const campPT = PAISES_TRADUZIDOS[mm.campeao] || mm.campeao;
+                const vicePT = PAISES_TRADUZIDOS[mm.vice] || mm.vice;
+
+                palpitesHTML += `
+                    <div class="mb-4 grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-slate-100/80 dark:bg-slate-950 p-2 rounded-xl border border-slate-200/40 dark:border-slate-800/50">
+                            <p class="text-[9px] text-slate-400 uppercase font-bold">Grupo</p>
+                            <p class="text-sm font-extrabold text-slate-800 dark:text-slate-200">${pessoa.pontosGrupoNovo} pts</p>
+                        </div>
+                        <div class="bg-slate-100/80 dark:bg-slate-950 p-2 rounded-xl border border-slate-200/40 dark:border-slate-800/50">
+                            <p class="text-[9px] text-slate-400 uppercase font-bold">Bônus Grupo</p>
+                            <p class="text-sm font-extrabold text-slate-800 dark:text-slate-200">+${pessoa.pontosBonusGrupo} pts</p>
+                        </div>
+                        <div class="bg-slate-100/80 dark:bg-slate-950 p-2 rounded-xl border border-slate-200/40 dark:border-slate-800/50">
+                            <p class="text-[9px] text-slate-400 uppercase font-bold">Mata-Mata</p>
+                            <p class="text-sm font-extrabold text-slate-800 dark:text-slate-200">${pessoa.pontosMataMata} pts</p>
+                        </div>
+                    </div>
+                `;
+
+                palpitesHTML += `
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Previsão da Final</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                                <span class="text-base">🏆</span>
+                                <div>
+                                    <p class="text-[9px] text-slate-400 uppercase font-bold">Campeão</p>
+                                    <p class="font-bold text-slate-800 dark:text-slate-200">${obterBandeira(mm.campeao)} ${campPT}</p>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                                <span class="text-base text-blue-500 dark:text-blue-400">🥈</span>
+                                <div>
+                                    <p class="text-[9px] text-slate-400 uppercase font-bold">Vice</p>
+                                    <p class="font-bold text-slate-800 dark:text-slate-200">${obterBandeira(mm.vice)} ${vicePT}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                Object.keys(pessoa.grupos).sort().forEach(grupo => {
+                    let totalAcertos = 0;
+                    pessoa.grupos[grupo].forEach(p => { if (p.correto) totalAcertos++; });
+                    const grupoGabaritado = totalAcertos === 4;
+
+                    const estiloBoxGrupo = grupoGabaritado ? 'bg-amber-50/20 dark:bg-amber-950/10 border-amber-300/60 dark:border-amber-800/50' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800/60';
+                    const textoGrupoHeader = grupoGabaritado ? `Grupo ${grupo} <span class="ml-1 text-[10px] font-extrabold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/40">+30 pts</span>` : `Grupo ${grupo}`;
+
+                    palpitesHTML += `
+                        <div class="mb-3 last:mb-0">
+                            <h4 class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5 px-1">${textoGrupoHeader}</h4>
+                            <div class="rounded-xl border overflow-hidden divide-y divide-slate-50 dark:divide-slate-800/50 ${estiloBoxGrupo}">
+                    `;
+
+                    pessoa.grupos[grupo].forEach(p => {
+                        const bgBadge = p.real === null ? 'bg-slate-100 dark:bg-slate-950 text-slate-500 dark:text-slate-400' : (p.correto ? 'bg-emerald-50 dark:bg-emerald-950/45 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/35 text-red-700 dark:text-red-400');
+                        const textoBadge = p.real === null ? 'Aguardando' : (p.correto ? '✓ Acertou' : `✗ ${p.real}º colocado`);
+
+                        const ptsBadge = p.correto ? 
+                            `<span class="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-100/50 dark:bg-emerald-950/45 px-2 py-0.5 rounded-full border border-emerald-200/30">+50 pts</span>` : 
+                            `<span class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800/60 px-2 py-0.5 rounded-full">+0 pts</span>`;
+
+                        const flagTime = obterBandeira(p.selecao);
+                        const timeNomeTraduzido = PAISES_TRADUZIDOS[p.selecao] || p.selecao;
+
+                        palpitesHTML += `
+                            <div class="flex justify-between items-center py-2.5 px-3">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">${flagTime} ${timeNomeTraduzido}</span>
+                                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Palpite: ${p.palpite}º colocado</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${bgBadge}">
+                                        ${textoBadge}
+                                    </span>
+                                    ${ptsBadge}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    palpitesHTML += `</div></div>`;
+                });
+
+                li.className = `bg-white dark:bg-slate-900 rounded-2xl sombra-suave dark:sombra-suave-dark card-animado overflow-hidden border border-slate-100 dark:border-slate-800 transition-colors duration-300`;
+                li.innerHTML = `
+                    <div class="flex items-center justify-between p-4 px-5 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors" onclick="toggleDetalhes('${uniqueId}')">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 text-center text-xl ${corPos}">${iconePos}</span>
+                            <span class="text-2xl">${pessoa.flagEmoji}</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-100 text-[15px] sm:text-base">${pessoa.nome}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1" title="Pontuação Simples">
+                                ${pessoa.pontosSimples} <span class="text-[9px] font-normal">/ 48</span>
+                            </div>
+                            <div class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 px-3 py-1 rounded-full font-bold text-xs border border-emerald-100 dark:border-emerald-800 shadow-sm">
+                                ${pessoa.pontosOficiais} pts
+                            </div>
+                            <svg id="seta-${uniqueId}" class="w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="detalhes-${uniqueId}" class="max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/70 dark:bg-slate-950/40">
+                        <div class="p-4 pt-5 border-t border-slate-100 dark:border-slate-800">
+                            ${palpitesHTML}
+                        </div>
+                    </div>
+                `;
+                rankingList.appendChild(li);
+            });
+        }
+
+        function renderizarVisualizacaoGrupos() {
+            const listContainer = document.getElementById('lista-jogos');
+            listContainer.innerHTML = '';
+
+            const timesClassificadosParaMataMata = new Set();
+            Object.values(matchesByPhase).forEach(fase => {
+                fase.forEach(m => {
+                    if (m.t1 && !m.t1Raw.toLowerCase().includes('group') && !m.t1Raw.toLowerCase().includes('winner') && !m.t1Raw.toLowerCase().includes('loser')) timesClassificadosParaMataMata.add(m.t1);
+                    if (m.t2 && !m.t2Raw.toLowerCase().includes('group') && !m.t2Raw.toLowerCase().includes('winner') && !m.t2Raw.toLowerCase().includes('loser')) timesClassificadosParaMataMata.add(m.t2);
+                });
+            });
+
+            let terceirosLugares = [];
+
+            Object.keys(standingsReais).sort().forEach(grupo => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 sombra-suave dark:sombra-suave-dark transition-colors duration-300";
+                
+                const equipesOrdenadas = Object.entries(standingsReais[grupo])
+                    .map(([nome, dados]) => ({ nome, ...dados }))
+                    .sort((a,b) => a.pos - b.pos);
+
+                if (equipesOrdenadas.length >= 3) {
+                    const terceiro = equipesOrdenadas[2];
+                    terceiro.grupoOrigem = grupo;
+                    terceirosLugares.push(terceiro);
+                }
+
+                let timesHTML = '';
+                equipesOrdenadas.forEach((eq, indexReal) => {
+                    const flag = BANDEIRAS_MAP[eq.nome] || '🏳️';
+                    
+                    let sgNum = parseInt(eq.sg);
+                    let sgClasse = 'text-slate-400 dark:text-slate-500';
+                    let sgValor = String(eq.sg).trim();
+                    if (sgValor.startsWith('+') || parseInt(sgValor) > 0) {
+                        sgClasse = 'text-emerald-600 dark:text-emerald-400';
+                        if (!sgValor.startsWith('+') && parseInt(sgValor) > 0) eq.sg = '+' + sgValor;
+                    } else if (sgValor.startsWith('-') || parseInt(sgValor) < 0) {
+                        sgClasse = 'text-red-500 dark:text-red-400';
+                    }
+
+                    const nomeTimeTraduzido = PAISES_TRADUZIDOS[eq.nome] || eq.nome;
+                    const isClassificado = eq.classificado || timesClassificadosParaMataMata.has(eq.nome);
+                    const isEliminado = eq.eliminado || (todasPartidasGruposJogadas && !isClassificado);
+                    let ptsClasse = 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200';
+                    
+                    if (isClassificado) {
+                        if (eq.pos === 1 || eq.pos === 2) {
+                            ptsClasse = 'bg-emerald-500 text-white shadow-sm';
+                        } else if (eq.pos === 3) {
+                            ptsClasse = 'bg-blue-500 dark:bg-blue-600 text-white shadow-sm';
+                        } else {
+                            ptsClasse = 'bg-emerald-500 text-white shadow-sm';
+                        }
+                    } else if (isEliminado) {
+                        ptsClasse = 'bg-red-500 dark:bg-red-600 text-white shadow-sm';
+                    }
+
+                    timesHTML += `
+                        <div class="flex justify-between items-center py-2.5 text-[11px] sm:text-xs">
+                            <div class="flex items-center gap-1.5 flex-1 min-w-0 mr-2">
+                                <span class="font-extrabold text-slate-400 dark:text-slate-500 text-[10px] w-4 text-center flex-shrink-0">${indexReal + 1}º</span>
+                                <span class="text-base leading-none flex-shrink-0">${flag}</span>
+                                <span class="font-semibold text-slate-700 dark:text-slate-300 truncate">${nomeTimeTraduzido}</span>
+                            </div>
+                            <div class="flex-shrink-0 flex items-center gap-1 text-center font-medium text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] w-[196px] justify-end">
+                                <span class="w-5">${eq.pj}</span>
+                                <span class="w-5">${eq.vit}</span>
+                                <span class="w-5">${eq.e}</span>
+                                <span class="w-5">${eq.der}</span>
+                                <span class="w-5">${eq.gm}</span>
+                                <span class="w-5">${eq.gc}</span>
+                                <span class="w-6 font-semibold ${sgClasse}">${eq.sg}</span>
+                                <span class="w-6 font-extrabold py-0.5 rounded transition-colors ${ptsClasse}">${eq.pts}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                let jogosHTML = '';
+                if (jogosGrupos[grupo] && jogosGrupos[grupo].length > 0) {
+                    jogosHTML = `<div class="mt-3 grid grid-cols-3 grid-rows-2 grid-flow-col gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">`;
+
+                    jogosGrupos[grupo].forEach((jogo) => {
+                        let corGols1 = 'text-slate-700 dark:text-slate-300 font-bold';
+                        let corGols2 = 'text-slate-700 dark:text-slate-300 font-bold';
+
+                        if (jogo.gols1 !== null && jogo.gols2 !== null) {
+                            if (jogo.gols1 > jogo.gols2) {
+                                corGols1 = 'text-emerald-600 dark:text-emerald-400 font-extrabold';
+                            } else if (jogo.gols2 > jogo.gols1) {
+                                corGols2 = 'text-emerald-600 dark:text-emerald-400 font-extrabold';
+                            }
+                        }
+
+                        const placar1 = jogo.gols1 !== null ? jogo.gols1 : '-';
+                        const placar2 = jogo.gols2 !== null ? jogo.gols2 : '-';
+
+                        const flag1 = BANDEIRAS_MAP[jogo.t1] || '🏳️';
+                        const flag2 = BANDEIRAS_MAP[jogo.t2] || '🏳️';
+                        const nome1 = PAISES_TRADUZIDOS[jogo.t1] || jogo.t1;
+                        const nome2 = PAISES_TRADUZIDOS[jogo.t2] || jogo.t2;
+
+                        jogosHTML += `
+                            <div class="flex items-center justify-center gap-1.5 text-xs bg-slate-50/50 dark:bg-slate-800/30 p-2 rounded-lg border border-slate-100 dark:border-slate-800" title="${nome1} x ${nome2}">
+                                <span class="text-base w-5 text-center">${flag1}</span>
+                                <div class="flex items-center justify-between font-black bg-white dark:bg-slate-900 rounded-md px-1.5 py-1 shadow-sm border border-slate-100 dark:border-slate-700 w-14">
+                                    <span class="${corGols1} w-3 text-center">${placar1}</span>
+                                    <span class="text-slate-300 dark:text-slate-600 text-[9px] font-normal">-</span>
+                                    <span class="${corGols2} w-3 text-center">${placar2}</span>
+                                </div>
+                                <span class="text-base w-5 text-center">${flag2}</span>
+                            </div>
+                        `;
+                    });
+                    jogosHTML += `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <h3 class="font-extrabold text-emerald-800 dark:text-emerald-400 text-xs uppercase tracking-wider">Grupo ${grupo}</h3>
+                        <div class="flex-shrink-0 flex gap-1 text-center font-bold text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-tight w-[196px] justify-end">
+                            <span class="w-5" title="Partidas Jogadas">PJ</span>
+                            <span class="w-5" title="Vitórias">VIT</span>
+                            <span class="w-5" title="Empates">E</span>
+                            <span class="w-5" title="Derrotas">DER</span>
+                            <span class="w-5" title="Gols Marcados">GM</span>
+                            <span class="w-5" title="Gols Concedidos">GC</span>
+                            <span class="w-6" title="Saldo de Gols">SG</span>
+                            <span class="w-6 text-emerald-700 dark:text-emerald-400 font-black" title="Pontos">Pts</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col divide-y divide-slate-50/70 dark:divide-slate-800/40">
+                        ${timesHTML}
+                    </div>
+                    ${jogosHTML}
+                `;
+                listContainer.appendChild(card);
+            });
+
+            if (terceirosLugares.length > 0) {
+                terceirosLugares.sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    const sgA = parseInt(a.sg) || 0;
+                    const sgB = parseInt(b.sg) || 0;
+                    if (sgB !== sgA) return sgB - sgA;
+                    return b.gm - a.gm;
+                });
+
+                const top8 = terceirosLugares.slice(0, 8);
+                const bottom4 = terceirosLugares.slice(8);
+
+                function gerarLinhaTerceiro(eq, indexReal) {
+                    const flag = BANDEIRAS_MAP[eq.nome] || '🏳️';
+                    let sgClasse = 'text-slate-400 dark:text-slate-500';
+                    let sgValor = String(eq.sg).trim();
+                    if (sgValor.startsWith('+') || parseInt(sgValor) > 0) {
+                        sgClasse = 'text-emerald-600 dark:text-emerald-400';
+                        if (!sgValor.startsWith('+') && parseInt(sgValor) > 0) eq.sg = '+' + sgValor;
+                    } else if (sgValor.startsWith('-') || parseInt(sgValor) < 0) {
+                        sgClasse = 'text-red-500 dark:text-red-400';
+                    }
+
+                    const nomeTimeTraduzido = PAISES_TRADUZIDOS[eq.nome] || eq.nome;
+                    const isClassificado = eq.classificado || timesClassificadosParaMataMata.has(eq.nome);
+                    const isEliminado = eq.eliminado || (todasPartidasGruposJogadas && indexReal > 8);
+
+                    let ptsClasse = 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+                    if (isClassificado) {
+                        ptsClasse = 'bg-blue-500 dark:bg-blue-600 text-white shadow-sm';
+                    } else if (isEliminado) {
+                        ptsClasse = 'bg-red-500 dark:bg-red-600 text-white shadow-sm';
+                    }
+
+                    return `
+                        <div class="flex justify-between items-center py-2.5 text-[11px] sm:text-xs">
+                            <div class="flex items-center gap-1.5 flex-1 min-w-0 mr-2">
+                                <span class="font-extrabold text-slate-400 dark:text-slate-500 text-[10px] w-4 text-center flex-shrink-0">${indexReal}º</span>
+                                <span class="text-base leading-none flex-shrink-0">${flag}</span>
+                                <div class="flex items-baseline flex-1 min-w-0">
+                                    <span class="font-semibold text-slate-700 dark:text-slate-300 truncate">${nomeTimeTraduzido}</span>
+                                    <span class="text-[9px] text-slate-400 ml-1 font-normal flex-shrink-0">(${eq.grupoOrigem})</span>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 flex items-center gap-1 text-center font-medium text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] w-[196px] justify-end">
+                                <span class="w-5">${eq.pj}</span>
+                                <span class="w-5">${eq.vit}</span>
+                                <span class="w-5">${eq.e}</span>
+                                <span class="w-5">${eq.der}</span>
+                                <span class="w-5">${eq.gm}</span>
+                                <span class="w-5">${eq.gc}</span>
+                                <span class="w-6 font-semibold ${sgClasse}">${eq.sg}</span>
+                                <span class="w-6 font-extrabold py-0.5 rounded transition-colors ${ptsClasse}">${eq.pts}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                let htmlTop8 = '';
+                top8.forEach((eq, index) => { htmlTop8 += gerarLinhaTerceiro(eq, index + 1); });
+
+                let htmlBottom4 = '';
+                bottom4.forEach((eq, index) => { htmlBottom4 += gerarLinhaTerceiro(eq, index + 9); });
+
+                const cardTerceiros = document.createElement('div');
+                cardTerceiros.className = "bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 sombra-suave dark:sombra-suave-dark transition-colors duration-300 mt-6";
+                
+                cardTerceiros.innerHTML = `
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <h3 class="font-extrabold text-blue-800 dark:text-blue-400 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-ranking-star"></i> Melhores 3º Lugares
+                        </h3>
+                        <div class="flex-shrink-0 flex gap-1 text-center font-bold text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-tight w-[196px] justify-end">
+                            <span class="w-5" title="Partidas Jogadas">PJ</span>
+                            <span class="w-5" title="Vitórias">VIT</span>
+                            <span class="w-5" title="Empates">E</span>
+                            <span class="w-5" title="Derrotas">DER</span>
+                            <span class="w-5" title="Gols Marcados">GM</span>
+                            <span class="w-5" title="Gols Concedidos">GC</span>
+                            <span class="w-6" title="Saldo de Gols">SG</span>
+                            <span class="w-6 text-blue-700 dark:text-blue-400 font-black" title="Pontos">Pts</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Apenas os <strong>8 melhores</strong> terceiros colocados avançam para a 2ª Fase.</p>
+                    </div>
+                    <div class="flex flex-col divide-y divide-slate-50/70 dark:divide-slate-800/40">
+                        ${htmlTop8}
+                    </div>
+                    <div class="border-t-2 border-dashed border-red-500 dark:border-red-500 my-2"></div>
+                    <div class="flex flex-col divide-y divide-slate-50/70 dark:divide-slate-800/40">
+                        ${htmlBottom4}
+                    </div>
+                `;
+                listContainer.appendChild(cardTerceiros);
+            }
+        }
+
+        function renderizarFaseEliminatoria() {
+            const container = document.getElementById('confrontos-eliminatorios');
+            container.innerHTML = '';
+
+            const confrontos = matchesByPhase[faseEliminatoriaAtiva] || [];
+
+            if (confrontos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300">
+                        <div class="text-3xl mb-3">🗓️</div>
+                        <h3 class="font-bold text-slate-700 dark:text-slate-300 text-sm">Confrontos em Definição</h3>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                            Os confrontos desta fase ainda não foram definidos na Wikipédia. As seleções qualificadas aparecerão automaticamente assim que a fase de grupos for concluída.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            let pontosRegra = 20;
+            let pontosRegraSc = 10;
+            let bracketKey = 'r16'; 
+            if (faseEliminatoriaAtiva === 'r16') { pontosRegra = 30; pontosRegraSc = 15; bracketKey = 'qf'; }
+            else if (faseEliminatoriaAtiva === 'qf') { pontosRegra = 40; pontosRegraSc = 20; bracketKey = 'sf'; }
+            else if (faseEliminatoriaAtiva === 'sf') { pontosRegra = 75; pontosRegraSc = 40; bracketKey = 'final'; }
+            else if (faseEliminatoriaAtiva === 'final') { pontosRegra = 100; pontosRegraSc = 0; bracketKey = 'campeao'; }
+
+            const nomesParticipantes = ['Fruet', 'Jacom', 'Raio', 'Gustavo'];
+
+            confrontos.forEach(jogo => {
+                const t1Traduzido = jogo.t1 && PAISES_TRADUZIDOS[jogo.t1] ? PAISES_TRADUZIDOS[jogo.t1] : traduzirPlaceholder(jogo.t1Raw);
+                const t2Traduzido = jogo.t2 && PAISES_TRADUZIDOS[jogo.t2] ? PAISES_TRADUZIDOS[jogo.t2] : traduzirPlaceholder(jogo.t2Raw);
+
+                const flag1 = BANDEIRAS_MAP[jogo.t1] || '⚽';
+                const flag2 = BANDEIRAS_MAP[jogo.t2] || '⚽';
+                const placar1 = jogo.gols1 !== null ? jogo.gols1 : '-';
+                const placar2 = jogo.gols2 !== null ? jogo.gols2 : '-';
+
+                let display1 = placar1;
+                let display2 = placar2;
+
+                if (jogo.pen1 !== null && jogo.pen2 !== null) {
+                    display1 = `${placar1} <span class="text-[10px] opacity-70 font-bold ml-1">(${jogo.pen1})</span>`;
+                    display2 = `${placar2} <span class="text-[10px] opacity-70 font-bold ml-1">(${jogo.pen2})</span>`;
+                }
+
+                let labelJogo = `JOGO ${jogo.matchNum}`;
+                if (jogo.matchNum === 104) {
+                    labelJogo = "FINAL";
+                }
+
+                const cardJogo = document.createElement('div');
+                cardJogo.className = "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3 transition-colors duration-300";
+
+                let apostasHTML = '';
+                const nomesParticipantes = ['Fruet', 'Jacom', 'Raio', 'Gustavo'];
+
+                let matchFinished = (jogo.vencedor !== null);
+                let winner = jogo.vencedor;
+
+                let bg1 = 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300';
+                let bg2 = 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300';
+                
+                if (matchFinished && winner) {
+                    if (winner === jogo.t1) {
+                        bg1 = 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400';
+                    } else if (winner === jogo.t2) {
+                        bg2 = 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400';
+                    }
+                }
+
+                let totalAcertosPartida = 0;
+
+                if (matchFinished && winner) {
+                    let acertosArray = []; // Array temporário para ordenar os acertos
+
+                    nomesParticipantes.forEach(nome => {
+                        const predictions = PALPITES_MATA_MATA[nome];
+                        if (predictions) {
+                            let pickOrig = false;
+                            let pickSc = false;
+                            const sc = predictions.segundaChance;
+                            
+                            if (bracketKey === 'campeao') {
+                                pickOrig = (predictions.campeao === winner);
+                                pickSc = false;
+                            } else if (bracketKey === 'final') {
+                                pickOrig = (predictions.campeao === winner || predictions.vice === winner);
+                                if (sc && sc.final) pickSc = sc.final.includes(winner);
+                            } else {
+                                pickOrig = predictions[bracketKey]?.includes(winner);
+                                if (sc) pickSc = sc[bracketKey]?.includes(winner);
+                            }
+
+                            if (pickOrig || pickSc) {
+                                totalAcertosPartida++;
+                                const flagWinner = BANDEIRAS_MAP[winner] || '⚽';
+                                let pontos = 0;
+                                let tipoCSS = '';
+                                
+                                if (pickOrig && pickSc) {
+                                    pontos = pontosRegra + pontosRegraSc;
+                                    tipoCSS = 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-700/50';
+                                } else if (pickOrig) {
+                                    pontos = pontosRegra;
+                                    tipoCSS = 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-800/40';
+                                } else if (pickSc) {
+                                    pontos = pontosRegraSc;
+                                    tipoCSS = 'bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-400 border-sky-100/50 dark:border-sky-800/40';
+                                }
+
+                                acertosArray.push({ nome, flagWinner, pontos, tipoCSS });
+                            }
+                        }
+                    });
+                    
+                    // Ordenação: 1º Maior Pontuação (decrescente), 2º Ordem Alfabética do Nome
+                    acertosArray.sort((a, b) => {
+                        if (b.pontos !== a.pontos) {
+                            return b.pontos - a.pontos;
+                        }
+                        return a.nome.localeCompare(b.nome);
+                    });
+
+                    // Gerar o HTML ordenado com as tags arredondadas originais
+                    acertosArray.forEach(acerto => {
+                        apostasHTML += `<span class="text-[10px] ${acerto.tipoCSS} px-2.5 py-1 rounded-full font-bold border shadow-sm transition-all duration-200">${acerto.nome} ${acerto.flagWinner} +${acerto.pontos} pts</span>`;
+                    });
+                    
+                    if (totalAcertosPartida === 0) {
+                        apostasHTML = `<span class="text-[10px] text-slate-400 dark:text-slate-500 italic">Ninguém acertou.</span>`;
+                    }
+                } else {
+                    apostasHTML = `<span class="text-[10px] text-slate-400 dark:text-slate-500 italic">Aguardando resultado da partida.</span>`;
+                }
+
+                cardJogo.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                        <span>${labelJogo} 📍 ${jogo.local ? traduzirLocal(jogo.local) : 'A Definir'}</span>
+                        <span>🗓️ ${jogo.data ? traduzirData(jogo.data) : 'A Definir'}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-1">
+                        <div class="flex-1 flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">${flag1}</span>
+                                <span class="font-bold text-sm text-slate-800 dark:text-slate-200">${t1Traduzido}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">${flag2}</span>
+                                <span class="font-bold text-sm text-slate-800 dark:text-slate-200">${t2Traduzido}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-center rounded-xl border border-slate-100/50 dark:border-slate-800/80 min-w-[4.5rem] text-center transition-colors overflow-hidden divide-y divide-slate-100/50 dark:divide-slate-800/50">
+                            <span class="font-extrabold text-sm w-full flex items-center justify-center py-1.5 ${bg1}">${display1}</span>
+                            <span class="font-extrabold text-sm w-full flex items-center justify-center py-1.5 ${bg2}">${display2}</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2.5 border-t border-slate-50 dark:border-slate-800/50 flex flex-col gap-2">
+                        <span class="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Previsões acertadas:</span>
+                        <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto hide-scroll">
+                            ${apostasHTML}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardJogo);
+            });
+        }
+
+        function isTeamEliminated(team) {
+            if (!team) return true;
+            
+            // Verifica eliminação matemática em fase de grupos
+            for (const grupo in standingsReais) {
+                if (standingsReais[grupo][team] && standingsReais[grupo][team].eliminado) {
+                    return true;
+                }
+            }
+            
+            // Se os grupos acabaram e não está na 2ª fase (r32)
+            if (todasPartidasGruposJogadas) {
+                let inR32 = false;
+                for (const m of matchesByPhase.r32) {
+                    if (m.t1 === team || m.t2 === team || (m.t1Raw && m.t1Raw.includes(team)) || (m.t2Raw && m.t2Raw.includes(team))) {
+                        inR32 = true; break;
+                    }
+                }
+                if (!inR32) return true;
+            }
+            
+            // Verifica se perdeu alguma partida eliminatória
+            for (const phase of Object.values(matchesByPhase)) {
+                for (const m of phase) {
+                    if (m.vencedor !== null) { 
+                        if ((m.t1 === team && m.vencedor !== team) || (m.t2 === team && m.vencedor !== team)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkTeamTarget(team, targetPhase) {
+            let phaseToWin;
+            if (targetPhase === 'r16') phaseToWin = 'r32';
+            else if (targetPhase === 'qf') phaseToWin = 'r16';
+            else if (targetPhase === 'sf') phaseToWin = 'qf';
+            else if (targetPhase === 'final') phaseToWin = 'sf';
+            else if (targetPhase === 'campeao') phaseToWin = 'final';
+
+            let won = false;
+            if (phaseToWin && matchesByPhase[phaseToWin]) {
+                for (const m of matchesByPhase[phaseToWin]) {
+                    if (m.vencedor === team) {
+                        won = true; break;
+                    }
+                }
+            }
+            if (won) return 'correct';
+            if (isTeamEliminated(team)) return 'wrong';
+            return 'pending';
+        }
+
+        // --- SISTEMA DO MODAL RAIO-X MATA-MATA ---
+        function renderPicksRow(picksArray, targetPhase, isSC, label = '') {
+            if (!picksArray) return '';
+            const validPicks = picksArray.filter(t => t);
+            if (validPicks.length === 0) return '';
+            
+            let html = '<div class="relative w-full mb-1.5">';
+            if (label) {
+                // Label posicionado absolutamente à esquerda, centralizado verticalmente caso haja mais de uma linha de bandeiras
+                html += `<div class="absolute left-0 top-1/2 -translate-y-1/2 text-[9px] font-extrabold text-slate-400 dark:text-slate-500 w-6 text-right">${label}</div>`;
+            }
+            
+            // O px-8 adiciona um "buffer" invisível igual nas laterais, garantindo que as bandeiras fiquem no centro exato da tela
+            html += '<div class="flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 px-8">';
+            validPicks.forEach(team => {
+                const status = checkTeamTarget(team, targetPhase);
+                let bgClass = 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 dark:opacity-40'; // Pending
+                
+                if (status === 'correct') {
+                    bgClass = isSC ? 'bg-blue-500 border-blue-600 text-white shadow-sm' : 'bg-emerald-500 border-emerald-600 text-white shadow-sm';
+                } else if (status === 'wrong') {
+                    bgClass = 'bg-red-500 border-red-600 text-white shadow-sm';
+                }
+                
+                const flag = BANDEIRAS_MAP[team] || '🏳️';
+                const tooltip = PAISES_TRADUZIDOS[team] || team;
+                html += `<div class="w-[26px] h-[26px] sm:w-[30px] sm:h-[30px] flex items-center justify-center text-sm sm:text-base rounded shadow-sm border ${bgClass}" title="${tooltip}">${flag}</div>`;
+            });
+            html += '</div></div>';
+            return html;
+        }
+
+        function renderizarModalMataMata() {
+            const body = document.getElementById('modal-palpites-body');
+            body.innerHTML = '';
+
+            dbJogadores.forEach((p, idx) => {
+                const pID = `mm-acc-${idx}`;
+                
+                const boxHtml = document.createElement('div');
+                boxHtml.className = "bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300";
+                
+                let mm = p.matamata || {};
+                let sc = mm.segundaChance || null;
+                
+                boxHtml.innerHTML = `
+                    <div class="p-4 flex justify-between items-center cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors" onclick="toggleMataMataAccordion('${pID}')">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${p.flagEmoji}</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-100 text-[15px]">${p.nome}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[11px] font-bold bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full text-slate-500 dark:text-slate-400 shadow-inner">${p.pontosMataMata} pts</span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300 text-sm" id="icon-${pID}"></i>
+                        </div>
+                    </div>
+                    <div id="content-${pID}" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 dark:bg-slate-950/30">
+                        <div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                            <!-- Originais -->
+                            <div>
+                                <h4 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center mb-2">Palpites Originais</h4>
+                                ${renderPicksRow(mm.r16, 'r16', false, 'R16')}
+                                ${renderPicksRow(mm.qf, 'qf', false, 'QF')}
+                                ${renderPicksRow(mm.sf, 'sf', false, 'SF')}
+                                ${renderPicksRow([mm.campeao, mm.vice], 'final', false, 'F')}
+                            </div>
+                            
+                            <!-- Segunda Chance -->
+                            ${sc ? `
+                            <div class="border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 mt-2">
+                                <h4 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center mb-2">Segunda Chance</h4>
+                                ${renderPicksRow(sc.r16, 'r16', true, 'R16')}
+                                ${renderPicksRow(sc.qf, 'qf', true, 'QF')}
+                                ${renderPicksRow(sc.sf, 'sf', true, 'SF')}
+                                ${renderPicksRow(sc.final, 'final', true, 'F')}
+                            </div>
+                            ` : `<div class="border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 mt-2 text-center text-xs text-slate-400 font-medium">Sem palpites de Segunda Chance</div>`}
+                        </div>
+                    </div>
+                `;
+                body.appendChild(boxHtml);
+            });
+        }
+
+        window.toggleMataMataAccordion = function(id) {
+            const div = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            if (div.style.maxHeight) {
+                div.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                div.style.maxHeight = div.scrollHeight + "px";
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        window.abrirModalPalpitesMataMata = function() {
+            renderizarModalMataMata();
+            const modal = document.getElementById('modal-palpites-mm');
+            const content = document.getElementById('modal-palpites-content');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // force reflow
+            modal.classList.remove('opacity-0');
+            content.classList.remove('translate-y-full');
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.fecharModalPalpitesMataMata = function() {
+            const modal = document.getElementById('modal-palpites-mm');
+            const content = document.getElementById('modal-palpites-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+        // ------------------------------------------
+
+        window.toggleDetalhes = function(id) {
+            const div = document.getElementById(`detalhes-${id}`);
+            const seta = document.getElementById(`seta-${id}`);
+            if (div.style.maxHeight) {
+                div.style.maxHeight = null;
+                div.classList.add('opacity-0');
+                seta.style.transform = 'rotate(0deg)';
+            } else {
+                div.classList.remove('hidden');
+                setTimeout(() => {
+                    div.style.maxHeight = div.scrollHeight + "px";
+                    div.classList.remove('opacity-0');
+                }, 10);
+                seta.style.transform = 'rotate(180deg)';
+            }
+        };
+
+        window.forcarSincronizacao = function() {
+            const icone = document.getElementById('icone-atualizar');
+            icone.classList.add('fa-spin');
+            setTimeout(() => {
+                inicializarSistema();
+                icone.classList.remove('fa-spin');
+            }, 800);
+        };
+
+        window.onload = function () {
+            inicializarSistema();
+        }
+    </script>
+</body>
+</html>
