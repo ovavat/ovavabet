@@ -14,6 +14,7 @@
     <link rel="shortcut icon" href="https://kappa.lol/QKdKIp" type="image/png">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -27,6 +28,7 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
@@ -42,7 +44,7 @@
 
     <nav class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-center relative">
-            <span class="font-extrabold text-2xl tracking-tight" style="color: #a041c6;">
+            <span class="font-extrabold text-2xl tracking-tight cursor-pointer hover:opacity-80 transition-opacity" style="color: #a041c6;" onclick="testarPopUpCampeao()" title="Clique para testar o popup do vencedor">
                 Ovavat
             </span>
             <button id="dark-mode-toggle" onclick="alternarModoEscuro()" class="absolute right-4 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300">
@@ -102,7 +104,6 @@
         </div>
 
         <div id="aba-matamata" class="hidden space-y-4">
-            <!-- Header Clickável para o Raio-X -->
             <div onclick="abrirModalPalpitesMataMata()" class="cursor-pointer bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700/60 group relative overflow-hidden">
                 <div class="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors border-l border-slate-100 dark:border-slate-800">
                     <i class="fa-solid fa-expand text-slate-400 group-hover:text-emerald-500 transition-colors"></i>
@@ -141,7 +142,6 @@
         </footer>
     </main>
 
-    <!-- Modal: Raio-X do Mata-Mata -->
     <div id="modal-palpites-mm" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-pointer" onclick="fecharModalPalpitesMataMata()"></div>
         <div class="absolute bottom-0 left-0 right-0 top-12 sm:top-20 max-w-lg mx-auto bg-slate-50 dark:bg-slate-950 rounded-t-3xl shadow-2xl overflow-hidden flex flex-col transform translate-y-full transition-transform duration-300 ease-out" id="modal-palpites-content">
@@ -154,15 +154,34 @@
                 </button>
             </div>
             
-            <div class="p-4 overflow-y-auto flex-1 hide-scroll space-y-3" id="modal-palpites-body">
-                <!-- Conteúdo inserido via JS -->
-            </div>
+            <div class="p-4 overflow-y-auto flex-1 hide-scroll space-y-3" id="modal-palpites-body"></div>
             
             <div class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 text-[10px] flex justify-center gap-4 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                 <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-emerald-500"></div> Acerto Orig.</div>
                 <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-blue-500"></div> Acerto S.C.</div>
                 <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm bg-red-500"></div> Erro</div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-campeao" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-500 flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm cursor-pointer" onclick="fecharModalCampeao()"></div>
+        <div class="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center transform scale-90 transition-transform duration-500 border border-slate-100 dark:border-slate-800" id="modal-campeao-content">
+            <div class="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none">
+                <div class="text-7xl drop-shadow-xl animate-bounce">🏆</div>
+            </div>
+            <div class="mt-8 mb-2">
+                <p class="text-xs font-extrabold tracking-widest uppercase text-slate-400 dark:text-slate-500 mb-1">A Copa acabou!</p>
+                <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 leading-tight">O grande vencedor do Bolão Ovavat é:</h2>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 my-6 border border-slate-100 dark:border-slate-800">
+                <div class="text-5xl mb-2" id="campeao-emoji">👑</div>
+                <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400" id="campeao-nome">Nome</div>
+                <div class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-1"><span id="campeao-pontos">0</span> pts</div>
+            </div>
+            <button onclick="fecharModalCampeao()" class="w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95" style="background: linear-gradient(135deg, #a041c6, #7a229c);">
+                Confira os resultados
+            </button>
         </div>
     </div>
 
@@ -640,65 +659,79 @@
 
         async function carregarJogosGruposWikipedia() {
             try {
-                const res = await fetch('https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup&format=json&origin=*');
-                const data = await res.json();
-                if (!data.parse || !data.parse.text) return;
-                const html = data.parse.text['*'];
-                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const gruposChaves = 'ABCDEFGHIJKL'.split('');
+                
+                // Dividimos em lotes de requisições para garantir que a API da Wikipédia não bloqueie
+                // além de buscarmos DIRETAMENTE na página específica do grupo onde os placares estão
+                const lotesDeRequisicao = [
+                    gruposChaves.slice(0, 4), // A, B, C, D
+                    gruposChaves.slice(4, 8), // E, F, G, H
+                    gruposChaves.slice(8, 12) // I, J, K, L
+                ];
 
-                const boxes = doc.querySelectorAll('.footballbox');
-                boxes.forEach(box => {
-                    let t1Node = box.querySelector('.fhome, .home, [itemprop="homeTeam"]');
-                    let t2Node = box.querySelector('.faway, .away, [itemprop="awayTeam"]');
-                    
-                    let t1Raw = t1Node ? t1Node.textContent.trim() : '';
-                    let t2Raw = t2Node ? t2Node.textContent.trim() : '';
-                    
-                    let t1Norm = normalizarNomePais(t1Raw);
-                    let t2Norm = normalizarNomePais(t2Raw);
+                for (const lote of lotesDeRequisicao) {
+                    const promessas = lote.map(g => 
+                        fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_Group_${g}&format=json&origin=*`)
+                            .then(res => res.json())
+                            .catch(err => null)
+                    );
 
-                    if (t1Norm && t2Norm) {
-                        let grupo = null;
-                        for (let g of Object.keys(standingsReais)) {
-                            if (standingsReais[g] && standingsReais[g][t1Norm] && standingsReais[g][t2Norm]) {
-                                grupo = g;
-                                break;
-                            }
-                        }
+                    const resultados = await Promise.all(promessas);
 
-                        if (grupo) {
-                            let scoreNode = box.querySelector('.fscore, .score, [itemprop="score"]');
-                            let scoreText = scoreNode ? scoreNode.textContent.trim() : '';
-                            let gols1 = null;
-                            let gols2 = null;
+                    resultados.forEach((data, index) => {
+                        const grupo = lote[index];
+                        if (!data || !data.parse || !data.parse.text) return;
+                        
+                        const html = data.parse.text['*'];
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
 
-                            const cleanScore = scoreText.replace(/\s+/g, '');
-                            if (cleanScore.includes('–')) {
-                                const parts = cleanScore.split('–');
-                                gols1 = parseInt(parts[0]);
-                                gols2 = parseInt(parts[1]);
-                            } else if (cleanScore.includes('-')) {
-                                const parts = cleanScore.split('-');
-                                gols1 = parseInt(parts[0]);
-                                gols2 = parseInt(parts[1]);
-                            }
-                            if (isNaN(gols1)) gols1 = null;
-                            if (isNaN(gols2)) gols2 = null;
-
-                            if(!jogosGrupos[grupo]) jogosGrupos[grupo] = [];
+                        // Procura por qualquer formato de tabela de jogo que a Wikipédia possa usar
+                        const boxes = doc.querySelectorAll('.footballbox, .fevent, table.vevent');
+                        
+                        boxes.forEach(box => {
+                            let t1Node = box.querySelector('.fhome, .home, [itemprop="homeTeam"]');
+                            let t2Node = box.querySelector('.faway, .away, [itemprop="awayTeam"]');
                             
-                            const exists = jogosGrupos[grupo].some(j => (j.t1 === t1Norm && j.t2 === t2Norm) || (j.t1 === t2Norm && j.t2 === t1Norm));
-                            if(!exists) {
-                                jogosGrupos[grupo].push({
-                                    t1: t1Norm,
-                                    t2: t2Norm,
-                                    gols1: gols1,
-                                    gols2: gols2
-                                });
+                            let t1Raw = t1Node ? t1Node.textContent.trim() : '';
+                            let t2Raw = t2Node ? t2Node.textContent.trim() : '';
+                            
+                            let t1Norm = normalizarNomePais(t1Raw);
+                            let t2Norm = normalizarNomePais(t2Raw);
+
+                            if (t1Norm && t2Norm) {
+                                let scoreNode = box.querySelector('.fscore, .score, [itemprop="score"]');
+                                let scoreText = scoreNode ? scoreNode.textContent.trim() : '';
+                                let gols1 = null;
+                                let gols2 = null;
+
+                                const cleanScore = scoreText.replace(/\s+/g, '');
+                                if (cleanScore.includes('–')) {
+                                    const parts = cleanScore.split('–');
+                                    gols1 = parseInt(parts[0]);
+                                    gols2 = parseInt(parts[1]);
+                                } else if (cleanScore.includes('-')) {
+                                    const parts = cleanScore.split('-');
+                                    gols1 = parseInt(parts[0]);
+                                    gols2 = parseInt(parts[1]);
+                                }
+                                if (isNaN(gols1)) gols1 = null;
+                                if (isNaN(gols2)) gols2 = null;
+
+                                if(!jogosGrupos[grupo]) jogosGrupos[grupo] = [];
+                                
+                                const exists = jogosGrupos[grupo].some(j => (j.t1 === t1Norm && j.t2 === t2Norm) || (j.t1 === t2Norm && j.t2 === t1Norm));
+                                if(!exists) {
+                                    jogosGrupos[grupo].push({
+                                        t1: t1Norm,
+                                        t2: t2Norm,
+                                        gols1: gols1,
+                                        gols2: gols2
+                                    });
+                                }
                             }
-                        }
-                    }
-                });
+                        });
+                    });
+                }
             } catch (e) {
                 console.error("Erro ao buscar jogos dos grupos:", e);
             }
@@ -814,10 +847,8 @@
                             if (isNaN(gols1)) gols1 = null;
                             if (isNaN(gols2)) gols2 = null;
 
-                            // Tratamento Ultrarrobusto de Pênaltis
                             let pen1 = null, pen2 = null;
                             
-                            // 1. Busca por (X-Y p) direto no placar principal
                             let scoreTextStr = scoreText || '';
                             let pMatch = scoreTextStr.match(/\((\d+)\s*[-–]\s*(\d+)\s*(?:p|pen|pên)?\.?\)/i);
                             
@@ -825,10 +856,8 @@
                                 pen1 = parseInt(pMatch[1]);
                                 pen2 = parseInt(pMatch[2]);
                             } else {
-                                // 2. Busca dentro da tabela/seção específica de pênaltis (.fpenalties)
                                 let penNodes = node.querySelectorAll('.fpenalties *, tr.fpenalties *');
                                 for (let pNode of penNodes) {
-                                    // Procura um elemento que tenha exatamente apenas o placar (ex: "4–3")
                                     if (/^\s*\d+\s*[-–]\s*\d+\s*$/.test(pNode.textContent)) {
                                         let penMatch = pNode.textContent.match(/(\d+)\s*[-–]\s*(\d+)/);
                                         if (penMatch) {
@@ -839,7 +868,6 @@
                                     }
                                 }
                                 
-                                // 3. Fallback: Procura no texto bruto logo após a palavra "penalties" (ignora quebras de linha)
                                 if (pen1 === null || pen2 === null) {
                                     const textLower = (node.textContent || '').toLowerCase();
                                     let pMatch3 = textLower.match(/(?:penalties|pênaltis|penáltis|g\.p\.|pen\.|pên\.)[\s\S]{0,300}?(\d+)\s*[-–]\s*(\d+)/);
@@ -954,6 +982,66 @@
             `;
 
             processarPalpitesEGerarRanking();
+        }
+
+        // Removido o LocalStorage para exibir o modal toda vez que o site carregar.
+        function verificarFimDoBolao() {
+            if (dbJogadores.length > 0) {
+                setTimeout(() => {
+                    mostrarModalCampeao(dbJogadores[0]);
+                }, 1500); 
+            }
+        }
+
+        function testarPopUpCampeao() {
+            if (dbJogadores.length > 0) {
+                mostrarModalCampeao(dbJogadores[0]);
+            }
+        }
+
+        function mostrarModalCampeao(vencedor) {
+            document.getElementById('campeao-nome').innerText = vencedor.nome;
+            document.getElementById('campeao-pontos').innerText = vencedor.pontosOficiais;
+            document.getElementById('campeao-emoji').innerText = vencedor.flagEmoji;
+
+            const modal = document.getElementById('modal-campeao');
+            const content = document.getElementById('modal-campeao-content');
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-90');
+            content.classList.add('scale-100');
+            document.body.style.overflow = 'hidden';
+
+            var duration = 4 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 70 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#a041c6', '#10b981', '#fcd34d'] }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#a041c6', '#10b981', '#fcd34d'] }));
+            }, 250);
+        }
+
+        function fecharModalCampeao() {
+            const modal = document.getElementById('modal-campeao');
+            const content = document.getElementById('modal-campeao-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 500);
         }
 
         function processarPalpitesEGerarRanking() {
@@ -1080,6 +1168,7 @@
 
             dbJogadores = jogadores;
             montarTelaRanking();
+            verificarFimDoBolao();
         }
 
         function obterBandeira(nome) {
@@ -1484,8 +1573,6 @@
             else if (faseEliminatoriaAtiva === 'sf') { pontosRegra = 75; pontosRegraSc = 40; bracketKey = 'final'; }
             else if (faseEliminatoriaAtiva === 'final') { pontosRegra = 100; pontosRegraSc = 0; bracketKey = 'campeao'; }
 
-            const nomesParticipantes = ['Fruet', 'Jacom', 'Raio', 'Gustavo'];
-
             confrontos.forEach(jogo => {
                 const t1Traduzido = jogo.t1 && PAISES_TRADUZIDOS[jogo.t1] ? PAISES_TRADUZIDOS[jogo.t1] : traduzirPlaceholder(jogo.t1Raw);
                 const t2Traduzido = jogo.t2 && PAISES_TRADUZIDOS[jogo.t2] ? PAISES_TRADUZIDOS[jogo.t2] : traduzirPlaceholder(jogo.t2Raw);
@@ -1531,7 +1618,7 @@
                 let totalAcertosPartida = 0;
 
                 if (matchFinished && winner) {
-                    let acertosArray = []; // Array temporário para ordenar os acertos
+                    let acertosArray = [];
 
                     nomesParticipantes.forEach(nome => {
                         const predictions = PALPITES_MATA_MATA[nome];
@@ -1554,36 +1641,34 @@
                             if (pickOrig || pickSc) {
                                 totalAcertosPartida++;
                                 const flagWinner = BANDEIRAS_MAP[winner] || '⚽';
-                                let pontos = 0;
-                                let tipoCSS = '';
+                                let totalPts = 0;
+                                let colorClass = '';
                                 
                                 if (pickOrig && pickSc) {
-                                    pontos = pontosRegra + pontosRegraSc;
-                                    tipoCSS = 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-700/50';
+                                    totalPts = pontosRegra + pontosRegraSc;
+                                    colorClass = 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-700/50';
                                 } else if (pickOrig) {
-                                    pontos = pontosRegra;
-                                    tipoCSS = 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-800/40';
+                                    totalPts = pontosRegra;
+                                    colorClass = 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-800/40';
                                 } else if (pickSc) {
-                                    pontos = pontosRegraSc;
-                                    tipoCSS = 'bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-400 border-sky-100/50 dark:border-sky-800/40';
+                                    totalPts = pontosRegraSc;
+                                    colorClass = 'bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-400 border-sky-100/50 dark:border-sky-800/40';
                                 }
 
-                                acertosArray.push({ nome, flagWinner, pontos, tipoCSS });
+                                acertosArray.push({ nome, flagWinner, totalPts, colorClass });
                             }
                         }
                     });
                     
-                    // Ordenação: 1º Maior Pontuação (decrescente), 2º Ordem Alfabética do Nome
                     acertosArray.sort((a, b) => {
-                        if (b.pontos !== a.pontos) {
-                            return b.pontos - a.pontos;
+                        if (b.totalPts !== a.totalPts) {
+                            return b.totalPts - a.totalPts;
                         }
                         return a.nome.localeCompare(b.nome);
                     });
 
-                    // Gerar o HTML ordenado com as tags arredondadas originais
-                    acertosArray.forEach(acerto => {
-                        apostasHTML += `<span class="text-[10px] ${acerto.tipoCSS} px-2.5 py-1 rounded-full font-bold border shadow-sm transition-all duration-200">${acerto.nome} ${acerto.flagWinner} +${acerto.pontos} pts</span>`;
+                    acertosArray.forEach(acc => {
+                        apostasHTML += `<span class="text-[10px] ${acc.colorClass} px-2.5 py-1 rounded-full font-bold border shadow-sm transition-all duration-200">${acc.nome} ${acc.flagWinner} +${acc.totalPts} pts</span>`;
                     });
                     
                     if (totalAcertosPartida === 0) {
@@ -1629,15 +1714,11 @@
 
         function isTeamEliminated(team) {
             if (!team) return true;
-            
-            // Verifica eliminação matemática em fase de grupos
             for (const grupo in standingsReais) {
                 if (standingsReais[grupo][team] && standingsReais[grupo][team].eliminado) {
                     return true;
                 }
             }
-            
-            // Se os grupos acabaram e não está na 2ª fase (r32)
             if (todasPartidasGruposJogadas) {
                 let inR32 = false;
                 for (const m of matchesByPhase.r32) {
@@ -1647,8 +1728,6 @@
                 }
                 if (!inR32) return true;
             }
-            
-            // Verifica se perdeu alguma partida eliminatória
             for (const phase of Object.values(matchesByPhase)) {
                 for (const m of phase) {
                     if (m.vencedor !== null) { 
@@ -1682,7 +1761,6 @@
             return 'pending';
         }
 
-        // --- SISTEMA DO MODAL RAIO-X MATA-MATA ---
         function renderPicksRow(picksArray, targetPhase, isSC, label = '') {
             if (!picksArray) return '';
             const validPicks = picksArray.filter(t => t);
@@ -1690,15 +1768,13 @@
             
             let html = '<div class="relative w-full mb-1.5">';
             if (label) {
-                // Label posicionado absolutamente à esquerda, centralizado verticalmente caso haja mais de uma linha de bandeiras
                 html += `<div class="absolute left-0 top-1/2 -translate-y-1/2 text-[9px] font-extrabold text-slate-400 dark:text-slate-500 w-6 text-right">${label}</div>`;
             }
             
-            // O px-8 adiciona um "buffer" invisível igual nas laterais, garantindo que as bandeiras fiquem no centro exato da tela
             html += '<div class="flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 px-8">';
             validPicks.forEach(team => {
                 const status = checkTeamTarget(team, targetPhase);
-                let bgClass = 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 dark:opacity-40'; // Pending
+                let bgClass = 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-60 dark:opacity-40'; 
                 
                 if (status === 'correct') {
                     bgClass = isSC ? 'bg-blue-500 border-blue-600 text-white shadow-sm' : 'bg-emerald-500 border-emerald-600 text-white shadow-sm';
@@ -1740,7 +1816,6 @@
                     </div>
                     <div id="content-${pID}" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/50 dark:bg-slate-950/30">
                         <div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                            <!-- Originais -->
                             <div>
                                 <h4 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center mb-2">Palpites Originais</h4>
                                 ${renderPicksRow(mm.r16, 'r16', false, 'R16')}
@@ -1749,7 +1824,6 @@
                                 ${renderPicksRow([mm.campeao, mm.vice], 'final', false, 'F')}
                             </div>
                             
-                            <!-- Segunda Chance -->
                             ${sc ? `
                             <div class="border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 mt-2">
                                 <h4 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center mb-2">Segunda Chance</h4>
@@ -1783,7 +1857,7 @@
             const modal = document.getElementById('modal-palpites-mm');
             const content = document.getElementById('modal-palpites-content');
             modal.classList.remove('hidden');
-            void modal.offsetWidth; // force reflow
+            void modal.offsetWidth;
             modal.classList.remove('opacity-0');
             content.classList.remove('translate-y-full');
             document.body.style.overflow = 'hidden';
@@ -1799,7 +1873,6 @@
                 document.body.style.overflow = '';
             }, 300);
         }
-        // ------------------------------------------
 
         window.toggleDetalhes = function(id) {
             const div = document.getElementById(`detalhes-${id}`);
